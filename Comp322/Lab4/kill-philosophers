@@ -1,0 +1,5 @@
+#! /bin/bash
+
+ps -ef | awk '/d[i]ning-p/{ print $2 }' | xargs kill -TERM
+
+echo

@@ -1,0 +1,563 @@
+Notes pertaining to Comp 598EA @ CSUN with Professor Wigley.
+Written By: Jared Fowler
+Date Started: February 11, 2015
+
+
+About: Notes will correspond directly to lecture and book reading. Book: An Embedded Software Primer by David E. Simon
+       The purpose of these notes is to help me, the creator, better understand the material in preparation for the tests.
+
+Chapter 1: First Look
+
+    What we want in an embedded system:
+        -Throughput: Being able to deal with all data continuously. "The amount of material or items passing through a system or process." 
+        -Response: Must be able to quickly respond, within a given time frame, even if system is currently doing something else.
+        -Testability: Difficult to do. Must consider all the many things that can go wrong on the system.
+        -Debug-ability: It's difficult b/c you don't have the convenience of a screen, keyboard, speaker, etc. You have to find other effective
+                        ways to debug the system.
+        -Reliability: The software must function without human intervention. It is not allowed to crash!
+        -Memory Space: Embedded systems normally have very little memory space. It is a skill set to fit your software into the small space.
+        -Program Installation: Not as simple as clicking a button with a mouse.
+        
+    Other things to consider:
+        -Power Consumption: How long does the costumer want the battery to last? (Example: At work, a scanner should work for an 8 hour shift.) Part of
+                            the design will be to determine when to turn off certain aspects of the hardware, including the processor!
+        -Processor Hogs: Work that ties up the processor for long periods of times makes the response time problem much harder.
+        -Cost: Client wants the product to be as cheap as possible, but, you get what you pay for. A cheap product may have response time issues, for example, 
+               if a simple process becomes a processor hog b/c the processor has a difficult time processing anything.
+               
+    Lecture:
+        -Pigs & Cost: Testing and debugging embedded systems can be very expensive, just as medical testing with special medical pigs can be. If something goes wrong,
+                      it's possible that you might have to re-buy more hardware, etc. 
+        -Speed: Build upon throughput and response. Different techniques for response include, from least to more sophisticated, the following: Round-Robin; Round-Robin w/interrupts;
+                Function Queue Scheduling; Real Time OS
+        -Cost: Sure we can build it smaller, but to what end? People are going to throw it out anyway to get a new one. Cost can by graphed in relation to size, speed, and power (duration).
+               As cost goes up, so does size, speed, and power.
+               
+               
+Chapter 2: Hardware Fundamentals
+
+    -Chip: Silicon chip with transistors on it.
+    -Package: Plastic or ceramic covering which encapsulates the chip. To connect to the outside world each package has a collection of pins.
+    -Pins: Metallic legs that protrude from the sides of a package which connect to the outside world semiconductors.
+    -Data Sheets: Provided by manufacture to give information about their product.
+    -Printed Circuit Board: Thin board which connects chips to one another via copper connections printed on it.
+    -Schematic Diagrams: Drawings that show each part needed in the circuit and the interconnections needed among them.
+    -Asserted: When the condition that is signalled is true.
+    
+    -Voltage: Most digital circuits use two voltages: 0 volts == ground/low == false; and [3,5] volts (VCC - Voltage Connected to Collector) == high == true
+              These values will sometimes have tolerances, depending on the chip, so low could be in range 0-1 volts for example
+    -Chips: Have inputs and outputs. Expect to sense a particular voltage through input connection, and are expected to control voltage level via output connection.
+    -Drive: The part of the circuit whose output controls the voltage on a given signal is said to drive the circuit. If no part of the circuit is driving the signal, then
+            the signal is said to be floating.
+    -Bus Fight: If two parts try to drive a signal at the same time in opposite directions. Parts will get very hot and stop working for good.
+    -Gates: Sometimes called discrete, is a composition of semiconductor transistors.
+    
+    Power and Decoupling:
+        -Basic Pins: Each chip has one, often called VCC pin, which is always connected to a high signal, and a ground pin which is always connected to a signal that is low.
+        -Brown Outs: When a chip changes many of its output signals from lo to hi or hi to lo at the same time, the chip will need a lot of power to do this, and sometimes more 
+                     power than what the skinny little conductors (printed wires?) can provide quickly. This can be combated with capacitors connected between the input VCC pin and 
+                     the ground pin. A capacitor used in this way is called a decoupling capacitor. Brown outs are caused by low voltage, and most chips stop working if voltage drops
+                     by about 10 percent.
+    
+    Open Collector and Tri-Stating Outputs: 
+        -Allows you to attach the outputs of several devices to drive a sngle signal.
+        -Open Collector:
+            -The idea is to have all outputting grouped chips either have ([low,high], float). The outputs are all connected to both the destination input AND a resistor. If the output has 
+             the ability to go low, then the resistor is called a Pullup resistor, which connects on the other side to VCC. If the outputs have the ability to go high, then the resistor is
+             called a pull down resistor, which connects to ground. Think of the input from VCC, or drainage from ground, traversing the resistor like a straw. With a pull down, we can still
+             signal high to the input b/c our output VCC from the chips is like a large tube, and the drainage is the straw. On the other case, we signal low to the input b/c our output ground from
+             the chips is like a large tube, and the filling VCC from the pull up resistor is like a small straw.
+        -Tri-State Drivers: 
+            -Have the capability of being one of three: High, Low, float
+            -Letting it float is called tri-stating or going into the high impedance state
+            -Useful when you want to allow more than one device to drive the same signal 
+            -Data lines can be reduced and reused by several chips.
+            -Unlike open collector, these are threatened with bus fights. If two or more tri-state drivers are asserted and output opposing signals, this will be a bus fight. It is up to software
+             or hardware design to avoid these situations
+            -The idea is to have a series of inputs, each leading to a different tri-state driver, which all output to the same line. Also going to the tri-state drivers is another input called "select". If select 
+             is low (let's assume this indicates we are not selecting the tri-state-driver), then the tri-state driver's output will float. If it is selected, the output will mimic its input line. A problem
+             may arise if none are selected and every output is therefore floating. (May cause unknown issues in the circuit). To fix this, we can add a pullup or pulldown resistor between the output of the drivers
+             and the input of the destination.
+             
+    Signal Loading:
+        -Loading Problem: When a circuits output isn't able to match the current absorbed by the "overloaded" circuit inputs. (Example: A single inverter's output leads to several component's inputs and not enough current goes through to satisfy all inputs.)
+                          We can combat this by adding a driver to the circuit, which essentially boosts the current of the input and sends it out. It is true that the driver introduces a bit of delay in the signal.
+        
+    Timing Diagrams:
+        -Timing Diagram: Shows the passage of time on the horizontal axis and shows each of the input/output signals changing and relation to one-another.
+        -Propagation Delay: The time which goes by before a resultant change is made in the output. Latency. For example, on a NAND gate, with both inputs true. Once one goes false, the latency for the output to assert true.
+        -Edge: The transition of a signal from high to low, and vice-versa. 
+        -Rising Edge: Transition from signal low to high.
+        -Falling Edge: Transition from signal high to low.
+        -D Flip-Flop, D-Flop, flip-flop, flop, register: Essentially 1-bit memory which works upon the rising edge of a signal (clock)
+        -Setup Time: The time where D, the input to a D-Flop, must remain constant on the clock rising edge.
+        -Hold Time: The time where D must remain constant after the rising edge.
+        -Clock: A signal normally created by either oscillators or crystal. The frequency should based upon the needs of other hardware components and should be an integer multiple of other communication devices in the system. (Easier to adjust than a fractional division.)
+        
+    Memory:
+        -Non-Volatile Memory: Doesn't forget its data when the power is turned off.
+        -Read-Only Memory (ROM):
+            -Read quickly by microprocessor, typically as fast read as execute.
+            -Data is unchangeable.
+            -Non-Volatile
+        -ROM Chips:
+            -Address Signals: Number depends on number of addresses...
+            -Data Signals: Typically 8-16 of these. Determined by the number of bits per address in ROM.
+            -Enable Signal: ...also known as the chip select signal.
+            -Read Enable: ...also known as the output enable (OE/).
+            -Way it works:
+                -Because of latency, Propagation Delay, the Chip Enabled will first be asserted to allow inputs to be read. After a few nano-seconds when the right output is ready,
+                 the Read Enable is asserted and the correct output is given.
+         -ROM Variants:
+             -General ROM: As discussed above, write once and never changed after. Sometime called "masked ROM".
+             -Programmable Read-Only Memory (PROM): Shipped from the manufacturer with nothing on it. It can be written to using a PROM programmer/burner. Once written to, it is masked ROM.
+             -Erasable Programmable Read-Only Memory (EPROM): Like PROM, but you can erase and re-use them via a strong ultra-violet light. EPROM erasers do this.. take around 10-20 minutes.
+             -Flash: Can be erased and re-written to via pin selection and microprocessor. 
+                 -Finite number of times you can re-write. (around 10,000 times);
+                 -Have to write an entire block of data at a time.
+                 -Writing process is slow.
+                 -Reading process is fast.
+                 -Microprocessor can't fetch instructions from flash while at the same time write to flash... Therefore, the flash programming program must be stored somewhere else.
+                 -Flash should normally only store program and very rarely changed configuration data.
+             -Electrically Erasable Read-Only Memory (EEROM or EEPROM): 
+                 -Very slow read and write.
+                 -Store very little data (1K or so).
+                 -Finite number of re-writes (order of millions of times.)
+                 -Useless to store program.. used more for configuration information that might change relatively frequently.
+         -Random Access Memory (RAM):
+             -Volatile.
+             -Very fast read and write.
+             -Static RAM: RAM which doesn't need to be refreshed once and a while... remembers its data by itself.
+             -Dynamic RAM: RAM which needs assistance to remember its data. RAM refresh is a circuit often built into the microprocessor which sole purpose is to refresh the ram once and a while.
+             -Dynamic RAM is cheaper than Static RAM.
+             -RAM Chips:
+                 -Look like ROM chips, except for an extra pin called "write enable" which tells the RAM if it should store new data.
+          
+    Lecture:
+    
+        -Laws:
+            -Ohm's Law:    E = IR    -->     Electromotive Force = Current * Resistance
+            -PIE:          P = IE    -->     Power (watts) = Current * Voltage
+            
+        -Chips:
+            -BGA: Ball Grid Array Technology. Connectors take advantage of surface area instead of parameter.
+            -Feature Count: Chips feature count is dependent upon surface area, while package's feature count is dependent upon perimeter (proportional to n)
+        
+        -CPU generally does the following: Fetch, Decode, Execute
+
+        -ROMs can be paired up if CPU can support it. For example, 2 32KB memory combined with highest address bit set to each of the ROM's chip enable input, with a negation gate for the lower address ROM.
+
+        -ROM USAGES:
+           -PROM: Production
+           -EPROM: Prototype Research
+           -EEPROM: Early 2000's prototype. Consumer products with updates.  Must re-write all.
+           -FLASH: Most current and popular for consumer up-datable. Rewritten in blocks, 'pages'.
+
+           
+CHAPTER 3:  Advanced Hardware Fundamentals 
+
+   -The very simple micro-processor
+      -Address signals used to inform other parts of the circuit what it wants to read
+      -Data signals to both get and send information
+      -Read Line which strobes (pulses) low when it wants to get data
+      -Write Line which pulses low when it wants to write data out
+      -Clock input which paces all the work of the MP (micro processor), thus, pacing the work of the rest of the system.
+         -Most will have two inputs to allow for crystal oscillator instead of more expensive clock generator.
+   -Micro-controller: A very basic microprocessor which has built on ROM and RAM. The book will use the word microprocessor interchangeably.
+   
+   -Address Bus: Address signals in a group.
+   -Data Bus: Data signals in a group.
+   -Microprocessor Bus, or BUS: Combination of address and data bus, along with the READ and WRITE signals from the MP.
+   -Memory Mapping: The concept of mapping out "memory", rather, memory addresses, to correspond to different devices b/c all devices might share the same address and data bus. (Ex: A system with
+                    ROM, RAM, and a network chip might allocate "memory addresses" as such: 0x00000 -> 0x3FFFF ROM, 0x40000 -> 0x7FFFF, and 0x80000 -> 0x800FF NETWORK)
+   -I/O Address Space: Like Memory Address Space, as addressed above, I/O address space refers to all I/O devices with their own map. A MP which supports this might have one or two extra pins which
+                       it signals to determine which it is going to read/write.
+   -Bus Cycle: The process by which the microprocessor handles the issue of "timing", that is, that the chips it talks to, like RAM and ROM, have various timing requirements in order to get valid data
+               onto the bus. The microprocessor has control of all these signals and decides when to look for data on the bus.
+   -Bus Handshaking: Collection of various mechanisms which are used to handle the bus cycle problem.
+      -No handshakes: The MP goes at its own speed and signals at whatever speed suits it. Either all components must be at same level as MP or buy slower MP so devices never fall behind it.
+      -Wait Signals: Gives the option to assert a signal which causes the CPU to wait. This isn't built into ROM's or RAM's and would have to be developed specially.
+      -Wait States: The ability to insert extra clock cycles in-between existing cycles. A piece of circuitry inside MP called a wait state generator is responsible for this behavior. Most wait state
+                    generators allow software to tell them how many wait states to insert into each bus cycle.
+         -If you select fast components or if clock cycles are precious then you can inerst the proper code just after startup to turn down the wait states.
+                 
+   -DMA (Direct Memory Access): Circuitry which can read data from an I/O device and then write it out to memory or read from memory and write to I/O device all without assistance and the associated overhead.
+      -Difficulty: Memory only has one set of address and data signals. We must make sure we are not trying to drive those at the same time the MP is.
+         -See book for example: I/O makes request to DMA (DMAREQ). DMA makes request to MP (BUSREQ). When MP is ready to give up the bus, gives DMA the go signal (BUSACK). DMA sets up address line, gives go signal to I/O (DMAACK) and enables Write to RAM.
+                                After write complete, DMA releases go from I/O (DMAACK), tri-states the address bus (floats it), and and releases its request to MP (BUSREQ). MP releases go signal to DMA (BUSACK).
+      -Once the DMA has transferred a byte, how does it know if there is another to transfer?:
+         -Edge Triggering: Requires that the I/O device lower DMAREQ after each byte and then raise it again. This rising edge will indicate that there is another byte to read.
+         -Level Triggering: I/O holds DMAREQ high until there are no more bytes to be read. This requires a very quick lower of signal when the last byte is transferred.
+         -OR: After DMAREQ, BUSREQ, BUSACK, the data read from I/O is held in a register on the DMA itself. This lowers the burden of the I/O device circuitry. This, however, would ultimately mean twice as much bus time.
+         -DMA Channel: Used if several I/O devices are present and want to use the DMA simultaneously to move data. One needed for each device.
+         
+   -Interrupts: MP is told to stop what it is doing and execute some other piece of software, the interrupt routine.
+      -Interrupt Request (IRQ): Signal which tells the MP that it is time to run the interrupt routine. (These are pins on the MP itself)
+         -Early pc's limited to 8 IRQ b/c 8 pins. Later moved to 16. Now more scalable by moving to APIC controllers.
+         -Normally open-collector and asserted low
+      
+   -Other Parts:
+      -Universal Asynchronous Receiver/Transmitter (UART): Converts data to and from a serial interface, that is, an interface on which the bits that make up the data are sent one after another.
+         -Registers on UART:
+            -Output: MP will write 1 byte at a time and UART will transmit them 1 bit at a time.
+            -Input: MP will read received bytes.
+            -Interrupt Request Reason
+            -ETC.
+         -Some have FIFO (First In First Out) structure which allows MP to write several bytes to the UART and then the UART can catch up.
+      -GLUE: Referring to all the other circuitry needed to handle the interaction of chips. (Gates, etc.)
+      -Programmable Logic Devices (PLD): a device which allows you to build essentially any type of glue circuit
+         -Programmable Array Logic (PALS): PLD with 10-20 pins and an array of gates that you hook up after you buy them.
+         -PAL Equations: describe what the PAL does.
+         -Essentially, PALS pack logic gates and what-not into a nice convenient package with pins coming out of it.
+      -Application-Specific Integrated Circuits and Filed-Programmable Gate Arrays (ASICs and FPGAs): Like PALS, but might have microprocessor as a core. Are very specific for the device and very expensive.
+         -Example: Decode Dolby Digital 5.1 surround stream. This will do that for you.
+      -Watchdog Timers: Keeps track of time as to catch software crashes. If not reset by a certain time length, sends a reset signal to the MP.
+      
+   -Built-Ins on the MP
+      -Peripheral: Fancy name for an auxiliary circuit.
+      -Timers: Once the expire can cause an interrupt signal.
+      -DMA:
+      -I/O Pins: Can be used to restart watchdog, or signal LED's, etc.
+      -Cache:
+      -Instruction Pipeline: Instructions loaded into such and give the MP more efficiency.
+      
+   -Things Hardware Engineers worry about that Software Engineers don't:
+      -You have to pay for every part of the circuit. Trials cost money.
+      -More parts take up more space, power, heat.
+      
+      
+Chapter 4:  Interrupts
+
+   -Interrupts: Cause the microprocessor in the embedded system to suspend doing whatever it is doing and to execute some different code instead
+   -Assembly Language: Human-readable form of instructions which the microprocessor knows how to do.
+   -Assembler: Translates assembly language into binary numbers before the microprocessor can execute them.
+   -Register (General-Purpose Registers): Hold values which the processor is working with. Located on the microprocessor itself.
+   -Special Registers:
+      -Program Counter: Keeps track of address of next instruction to execute.
+      -Stack Pointer: Stores memory address of the top of the general purpose microprocessor stack.
+      -Accumulator: Some microprocessors can only do arithmetic on this register, however, many can do standard arithmetic in any register.
+      
+   -Interrupt Basics:
+      -Interrupts begin with a signal from the hardware.
+      -IRQ: Interrupt Request. Connection pin on the Microprocessor which lets it know that some other chip needs help. (Interrupt)
+      -Interrupt Routine: Routine called when an interrupt is signalled. The address of the instruction that would have had been next gets stored onto the stack.
+         -Interrupt routines must also do some housework, such as resetting the interrupt-detecting hardware.
+         -Sometimes called an interrupt handler, or an interrupt service routine (ISR).
+         -End of an ISR is to do a RETURN which causes the MP to retrieve the address from the stack of its next instruction.
+         -Good idea to PUSH all used registers and then POP them at the end of the ISR.
+            -Saving the Context: Pushing all registers at beginning of ISR
+            -Restoring the Context: Popping all registers off at the end.
+      -Task Code: Any code that is not part of the ISR.
+      -Disabling Interrupts:
+         -Can be disabled at the source via software, but normally software indicates on the MP to ignore an interrupt signal specified by pin.
+         -Non-maskable Interrupt: Interrupt that cannot be disabled. Most of the time only used for catastrophic events such as power failures.
+         -Most of the time you can assign each interrupt a priority. You can disable interrupts by setting the required priority above that of all the interrupts, and then re-enable them by setting the required priority level.
+      -How does the MP know where to go when an interrupt is signalled?
+         -Sometimes interrupt functions are at fixed addresses.
+         -Most of the time there exists a table filled with interrupt vectors, that is addresses to interrupts.
+            -When an interrupt occurs the MP will look up the address of the interrupt routine in the interrupt vector table.
+               -How does the MP know where to look for this table? Generally fixed location in memory such as 0x00000.
+         -Another approach is to have dedicated registers... expensive?
+      -Does an interrupt stop an instruction which is in the middle of processing?
+         -No. Finishes instruction first, except for some select ones that are long.
+      -Interrupt Nesting: Allowing interrupts to be called within interrupts.
+      -Interrupts are disabled when the CPU first starts up.
+      -Normally in C, there is a special key word which allows the compiler to know tat the function is the ISR.
+      
+   -Shared-Data Problem:
+      -Normally we'll want the interrupt routine to signal task code to do a follow-up procedure instead of staying within an interrupt for a long period of time
+         -To do this, the interrupt and task code must share some variables in order to communicate with one-another
+         -These variables, depending who is reading and writing to them, can cause faulty results. Do not think of a statement in C as a single instruction. Even a single statement in C can be interrupted
+      -You could disable interrupts while doing a portion of code, and then re-enable them after you pass the section
+   -Atomic: A program which cannot be interrupted. If interrupts have been disabled around a particular code segment, those lines are atomic.
+   -Critical Section: A set of instructions that must be atomic for they system to work properly.   
+   -One idea is to determine if interrupts were enabled or disabled before the start of the critical section. This way, at the end of the critical section we can set it back the way it was before.
+   -Volatile: Allows you to warn the compiler that certain variables may change because of interrupt routines or other things the compiler doesn't know about. With this declaration, the copmiler knows that the MP must read the value from memory every time it is referenced.
+      -If compiler doesn't support this, you could turn off optimizations, but this probably isn't a good idea.
+      
+   -Interrupt Latency:  Amount of time it takes a system to respond to an interrupt.
+      -Make interrupt routines short
+      -Disable interrupts for only short periods of time (i.e. don't shut them off for too long while running task code)
+   
+   -LECTURE:
+      -Instruction Set
+         -CALL: pushes the following instruction address onto the stack and places subroutine start address into the program counter.
+            -This is implicitly done by the hardward when a ISR is called.
+         -RETURN: Pops the top stack value from the stack and places it in the program counter register.
+      -Good practice to use a little registers as possible
+         -Probably b/c context save and restore times, and for simplicity.
+      -Interrupts with a lower priority than the "threshold" are ignored.
+   
+   
+Chapter 5: Survey of Software Architectures
+
+    -Most important factor to consider is how much control you need over system response. This is dependent on both software timing requirements AND the hardware units.  
+    
+    -Round Robin: No interrupts. The main loop simply circles around looking at the I/O devices and determines if any of them need attention.
+       -Its main benefit is its simplicity.
+       -Latency is limited by the maximum duration of a loop cycle.
+       -Problems arise when devices need attention sooner than RR can provide, and the tasks that RR is currently handling might take a while to do.
+       -For tasks that need quicker response time, you could have a higher frequency of those tasks.. tasks = {A,B,Z} loop (A,Z,B,Z).  This has poor scalability.
+    -Round Robin With Interrupts: Same idea as round robins but gives you more flexibility with interrupts.
+       -You run into the challenge of shared resources. Unlike RR without interrupts, you have to avoid race conditions.
+       -ShortComings include that all interrupts are held at the same priority. This can be changed by perhaps having a check for interrupt 'a' occur more frequently than interrupt 'b', but this might be more trouble than it's worth. The worse case scenario
+        is when interrupt 'a' is very high priority but we miss it in the loop and interrupts 'b' and 'c' also both want attention and 'a' has to wait for both of them.
+    -Function-Queue-Scheduling:
+       -Interrupt routines add a pointer to a function to a queue of function pointers for the main function call.
+          -The flexibility comes from main being allowed to arrange the queue anyway it wants, thus, putting higher priority items first.
+             -Benefit is that any interrupt has the opportunity to run with every loop of main. 
+             -The draw back is that an interrupt with low priority may never get the chance to run. This can ultimately slow down the system if such interrupt is critical for a larger task.
+             -The queing algorithm may be complex or costly to run.
+             -Once you start follow-up task x, you must wait for it to finish before starting another follow up task.
+                -So there will only ever be 1 follow-up task to wait for, but you have to wait for it.
+                  -What needs to be done immediately can just be placed in the interrupt itself.
+    -Real-Time Operating System: 
+      -Signalling between interrupt routines and the task code is handled by the RTOS
+      -No loop in our code decides what needs to be done next.
+      -Can suspend one task code subroutine in the middle of its processing in order to run another.
+      -Therefore
+         -Worst wait time for highest priority is 0.
+      -These are sometimes readily available for purchase, thus solving some of your problems without having to write code for yourself.
+      -Disadvantage is that the RTOS itself is using processing time. This gives you better response, but lower throughput.
+      
+    -Sometimes you can mix and combine the architectures for a hybrid system.
+   
+   
+Chapter 6: Introduction to Real-Time Operating Systems
+
+    -Some aliases for Real-Time OS: RTOS, kernel, real-time kernel (RTK).
+    -Differences between RTO annd Desktop OS:
+       -Application of RTO takes control on start-up versus OS 
+       -RTOS don't have same protection (eg. pointer misuse), instead, focus on speed.
+       -RTOS only include services you need to save memory.
+       
+    -Tasks and Tasks States
+       -Task: Subroutine within a RTOS. Are always in one in three states.
+          -Running: MP is executing the instructions that make up this task.
+          -Ready: Some other task is running on the MP but this task has things that it could do.
+          -Blocked: Task hasn't anything to do at the moment, even if the MP is available. Normally in this state b/c waiting for some external event.
+          
+          
+          
+                           Dispatch
+                           ------->
+          START -->  READY          RUNNING --> termination
+                       \   <------    /
+               unblock  \  timeout   / blocking
+                         \          /  
+                           BLOCKED
+          
+          
+       -Other states (really just subversions of main 3)
+          -Suspended, Pended, Waiting, Dormant, Delayed.
+       
+       -The Scheduler: Keeps track of the state of each track and decides which one task should go into the running state.
+          -Unlike windows or unix schedulers, and RTOS is very simple. Normally based off priorities, not caring about if a task of low prioirty ever gets pushed through.
+          -Tasks put themselves into the blocked state. They do this b/c they determine that they cannot run any further without needed information.
+          -Preemptive: Will stop lower priority task as soon as a higher priority task becomes ready.
+          -Non-preemtive: If a higher priority task becomes ready, it will wait for the lower priority to block before getting control.
+       
+    -Tasks and Data:
+       -Context: Each task has its own private context.
+          -Registers, program counter, stack.  Everything else is shared throughout the system.
+       -The RTO itself might have its own data section which is not available to any other task.
+       
+       -Reentrancy: Reentrant functions are those which can be called by more than one task and that will always work correctly, even if a switch occurs in the middle.
+        These must abide by three rules:
+           1. May not use variables in a non-atomic way, unless they are stored on the stack, rather a private variable of the task.
+           2. May not call any other functions which are not reentrant.
+           3. May not use the hardware in a non-atomic way.
+           
+           (NOTE: malloc and printf are both non-reentrant)
+           
+       -Semaphores: Allow the use of shared resources without having tasks crash on one-another.
+          -They only work when used perfectly. There is no guarantee that you or your co-workers will do so.
+             -Forgetting to "take" (wait) the semaphore.
+             -Forgetting to "release" (signal) the semaphore.
+             -Taking the wrong semaphore
+             -Holding the semaphore too long.
+          -Priority Inversion: a problematic scenario in scheduling in which a high priority task is indirectly preempted by a medium priority task effectively "inverting" the relative priorities of the two tasks.
+          -Priority Inheritance: method for eliminating priority inversion. Using this programming method, a process scheduling algorithm increases the priority of a process (A) to the maximum priority of any other process waiting for any resource on which A has a resource lock.
+          -Deadly Embrace: Dead-Lock in the simplest sense. Classic example of two semaphores A,B, where P1 has A and waits on B, and P2 vice-versa.
+          
+          -Counting Semaphores: Those which can be taken 'n' times before running out. Each time a task takes a resource, the semaphore is decrement. If at zero, causes task to be blocked until available.
+          -Resource Semaphores: This is what I'd consider the normal type of semaphore.  Those taken by the task but cannot act as a means of communication between processes. 
+          -Mutex: Binary Semaphore. Automatically deals with priority inversion problem.
+          
+       -3 major ways to avoid the share data problem
+          -Disable interrupts: Fast and only method that works when data is shared between task code and interrupt routine. 
+          -Semaphores: Most targeted way b/c only those that need to take data are effected.
+          -Disable task switches: Has no effect on interrupt routines, but it stops response for all other tasks cold.
+       
+Chapter 7: More Operating Systems
+
+    -Message, Queues, Mailboxes, Pipes
+       -Pointers and Queues:
+          -Queue exists in global space. Functions associate with this queue through a global pointer.
+       -Mailboxes:
+          -Just like queues... Normally functions exist to create, write, read, destroy.
+          -Mailboxes may hold several messages or just one. Once full, cannot put more into it.
+          -Messages can sometimes be prioritized.
+       -Pipes:
+          -Same idea as queues. RTOS can create, write, read, etc. from them.
+          -Fixed, zero-buffer, unbounded.
+          
+       -The RTOS guarantees that the functions provided for using these mechanisms are reentrant.
+       -Pitfalls
+         -Coordination of which tasks read/write to/from any of the three is up to the programmer design.
+         -RTOS does not guarantee that the data is interpreted correctly.
+         -Running out of space is usually a disaster in RTOS.
+         -Pointer Passing:
+            -Avoid by treating pointer as a single object that can exist in one task at a time.
+               -Once the task adds the pointer to a queue, it gives it up and doesn't use it in that task anymore.
+    
+    -Timer Functions:
+       -One common service of RTOS is to delay a task for a period of time.
+       -Some RTOs take in a parameter of milliseconds, while others take in the number of system ticks. 
+       -Timers are often built upon a single interrupt timer known as the "heartbeat timer". An interrupt is sent off periodically (eg. every 3 milliseconds)
+       -Short system tick is more accurate but must execute the timer interrupt routine frequently.
+       -Timer interrupts can be used to call another function of your choice.
+       
+       -RTOS will provide a variety of timers:
+          -Limit how long a task will block waiting to read from a queue
+          -limit how long a task will block waiting for a semaphore
+          -schedule a function to execute after some period of time
+       
+    -Events: Boolean flag that tasks can set or reset and that other tasks can wait for.
+       -More than one task can block while waiting for an event. Once triggered, all tasks will be ready and execute in priority order.
+       -Events can be grouped together...
+          -Tasks can wait on these group of events. Unblocked if any one of the events sets the flag
+    
+       -Semaphores are usually fastest and simple
+       -Events are a little more complicated and take up more time.
+       -Queues allow large quantities of info to be communicated but take up more time and resources.
+    
+    -Memory Management:
+       -Pools: Groups of memory buffers. The buffers are the same size within each single pool. You may have pools of pools.
+          -Fast, but may cause wasted space if very little data is given a full size buffer to be stored in.
+          
+    -Interrupt Routines In RTOS:
+       -RULES:
+          -Must not call any RTOS function that might block the caller... aka, don't get into blocked state while in interrupt routine
+             -This could obviously cause a sense of deadly embrace, or dead-lock. System could be halted indefinitely.
+          -Must not do anything that could cause the RTOS to switch tasks, such as setting events, releasing semaphores, etc. UNLESS the other task is aware of what is going on.
+             -This can be battled with configurations such as always giving control to the interrupt that did the action (setting events, release semaphore, etc), even if a task of higher priority is now ready.
+             -Nested Interrupts can be disabled, thus allowing one interrupt to finish at a time.
+             
+            (NOTE: We could keep track of nested interrupts, that is, how far in we are nested, with a simple counter. This could be helpful especially if we want to disable the scheduler upon entering an interrupt. For every interrupt we nest into, we increase the counter by 1. Once the counter reaches 0, b/c we decrement each time we exit a routine, we re-enable the scheduler.)
+             
+Chapter 8: Basic Design Using a RTOS
+
+   -Deadlines:
+      -Hard real-time systems: systems with absolute deadlines.
+      -Soft real-time systems: systems that desire hard deadlines but allow some fluff.
+   -Write shorter interrupt routines
+      -B/c they are bug prone and harder to debug and b/c longer interrupts, even at lowest priority level. results in slower task-code response. (That which is not part of the interrupt.)
+   
+   -How Many Tasks?
+      -Advantages:
+         -More tasks means better relative response times of the different parts of your system. 
+         -Using a separate task for each device allows for more modular code and cleaner code.
+         -More separate tasks can help in encapsulation, as an individual device only needs specific functionality and resources.
+      -Disadvantages:
+         -More tasks means you might have more data shared between them, hence, data sharing problems.
+         -More tasks also might mean message sharing requirements via mailboxes, pipes, queues, etc... which translates to more MP time, and possibly more bugs.
+         -Because each task requires a stack, more tasks means more space needed.
+         -Context switch times.
+         -More tasks means more calls to the RTOS.... which takes time and doesn't really help our throughput.
+      -Conclusion: "other things being equal, use as few tasks as you can get away with; add more tasks to your design only for clear reasons."
+   
+   -When to add tasks:
+      -Priority:
+         -Improved control over task code response.
+      -Encapsulation:
+         -The idea is to allow a single task to deal with a single aspect/device in a system. When interaction is needed with the device,
+          the other tasks send messages to the task which is in charge of the device. This allows for greater control, or less chaos, and is less prone to bugs.
+      -Many small tasks with each being simple, or have separate tasks that needs to be done in response to stimuli.    
+     
+   -Avoid Creating and Destroying Tasks:
+      -Takes a long time to do so and it doesn't accomplish anything for throughput. 
+      -Better idea is to create all tasks at start-up and have the tasks set on hold until they are needed/signalled. In this way, the only resource being used is stack space.
+      
+   -Time Slicing: Given the MP a task for a certain amount of ticks and then switching to another task, and then back-and-forwards again. This can occur when two tasks with equal priority are ready. May very much want to consider turning this feautre off for many systems.
+      -This is normally great for a system with a bunch of user programs running... but not so much for an embedded system where only 1 urgent task may be running at a time.
+      -Causes more context switching and therefore less throughput.
+      
+   -When using an RTO (pre-written one that you buy for example) consider what services you really need. Many will write a shell on top of the RTOS and only use calls to that shell allowing for better portability.
+   
+   8.4:
+   -Encapsulating Semaphores and Queues: Good idea as to not allow corruption within the code. Basic idea is to have function handlers take care of writing to queues and semaphores. All other functions which need to enqueue something would call this function handler.
+   
+   8.5:
+   -Being predictable versus being fast... To meet deadlines you must ensure that each of your tasks has a worst case predictable execution time.
+   
+   8.6 Saving Memory Space:
+   -Stack Inspection:
+      -Limit your stack size to the largest it will possibly need to be.. you can do this via hard inspection, or you could write default values to the stack, run the program for a while and then look at the stack to see up to what point values were modified.. there is not gaurantee with this second method.
+   -Avoid using double functions: Can I get away with using this one function rather than these two? 
+   -Make sure that development tools aren't throwing in functions that your not using. (Eg. Throws in entire math library b/c you use a single funciton from it.)
+   -Modify RTO to not include functions which you don't use.
+   -Be aware of translation to code to assembly. Some types of code will translate much nicer to assembly (fewer lines) than others.
+   -Consider using static, as it is sometimes faster to read/write than local stack variables.
+   -Consider using char versus int.. for example in a loop you can use 8btis for the index instead of 32bits.
+   -Write your code in assembly! Hooray!
+   
+   8.7 Saving Power:
+   -Many embedded system processors have at least one power-saving mode; some have several such as sleep, low-power, idle, standby, etc.
+   -A very common power saving mode is to stop executing instructions, built-in peripherals, and clock-circuit.
+      -Normally only way to start it back up is to reset it...
+   -How does the system know if it is turned on for the first time or just coming out of sleep?
+      -Can write a value to RAM and check that address for that value upon waking up. If it's there, it just came out of sleep. (This, of course, requires RAM to be kept on.)
+   -Execution of instructions can stop but the on-board peripherals can continue to monitor. When one is activated, an interrupt is sent to MP, thus starting it up with that interrupt routine.
+   -Bar scanner works in a way that the entire device shuts down. Upon pulling the trigger, this will actually turn on the system. (Acts as both a scanning button and an on button.)
+   
+
+Chapter 9: Embedded Software Development Tools
+
+   9.1 Host and target Machines
+      -The target machine many not have a keyboard, screen, etc, so easier to develop on a host machine. Also, we consider the editors and other programs needed to develop the device which probably can't run on the target device.
+      -Native Tools: Those tools which come with the host computer for complileing, buliding, linking, etc. the code to run on the host device.
+      -Cross-Compiler: a program which runs on your host machine but produces binary that will be understood by the target device. 
+         -Compatibility errors may still arise based upon the written code. For example, a function called without declaration in the host machine may not be recognized by the target machine. Normally loops, if's, etc. are not going to cause problems.
+            -Variable sizes may be different on the host than they are on the target device...
+      -Cross-Assembler: assembler which runs on the host but will produce binaries for the target. The assembly used for programming on the host machine should be the assembly based upon target device, not the host.
+      -Tool Chains: Idea based upon the different stages of translating from c/c++/assembly/etc. code to object files and then to linker to executable file. Each output from each stage becomes the next stages input.
+      
+   9.2 Linker/Locators for Embedded Software
+      -Linkers in embedded systems are different, in that they do more, than native linkers.
+         -Native linkers output the executable code to be used by a loader.. that is, the OS uses a loader whenever it wants to load/run the program.
+         -Cross-Linkers output something ready to be written to a target device. What is written has to be able to run by itself b/c there is no OS to load it.
+         -Address Resolution: Solving the problem that many MP operations contain the address of their operands.. so, assigning the correct binary addresses in place of the addressed operands.
+            -Compiler will set flags indicating that these areas need to be resolved later..
+            -It is the linkers job to set these values. It doest his based upon determined address spaces.
+         -The cross-compiler breaks up a given piece of code, say a file, into segments. These segments can include things like code, initialized data, unitialized data, etc. The idea is to have these segments separated by what they are.
+            -Linker will take these segments from all the pieces of code, now in object files, combine them, and decide where to place them in memory.
+         -Shadow Segment: Values that are to be in RAM cannot be written as such until the machine is powered in. The shadow segment in ROM is a map to how RAM is to be initialized upon system power-on.
+         -In general, there are some things that need to be worked around to determine which segment category they belong to.
+         -Locator Maps: Most locators will create an output file called a map which lists where the locater placed each of the segments in memory.
+         -Sometimes we want the program to run off of RAM not ROM. To do this, we'll have to have the locater write to ROM in such a way to indicate this. Perhaps the code can be compressed in ROM and decompressed when written to RAM.
+   9.3 Getting Embedded Software into the Target System
+       -PROM Programmers:
+          -Uses special device. Recommend using a socket hook up versus soldering it so that it can be easily replaced with new PROM for next update.
+       -ROM Emulators:
+          -Device which can connect into a ROM socket and can emulate ROM. The device itself is a bit larger but can be obviously used over and over again without releasing the connection b/c can simultaneously connect to the host.
+       -Flash:
+          -Generally you can use software to write to flash without the need to remove the chip from the board. 
+       -Monitors:
+          -A program which resides in target ROM and knows how to load new programs onto the system.
+       
+
+Chatper 10: Debugging Techniques
+
+   -Goals of typical testing process:
+      -Find bugs early in development process
+      -Exercise all of the code
+      -Develop reusable, repeatable tests
+      -Leave an "audit trail" of test results
+   -Basic Technique:
+      -
+   -Test Interrupt Routines
+   -Test timer interrupt routines
+   
+   -Utilize scripts to test interrupt routines
+     

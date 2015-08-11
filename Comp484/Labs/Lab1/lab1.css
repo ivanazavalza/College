@@ -1,0 +1,258 @@
+/*
+  Created By: Jared Fowler
+        Date: February 12, 2015
+       Class: Comp 484 w/Kaplan
+  Assignment: Lab 1 - CSS
+*/
+
+/* Note: This is my first time ever creating a CSS document! Hooray! */
+
+/*Design:
+
+   I spent hours trying to determine how to best set this all up. In the end, I
+   decided to make outer panels which would then encapsulate inner boxes. The panels
+   themselves are not worried about margins or padding, they simply seek to fill the
+   space to which they are assigned. Unfortunately, I ran across the problem where if 
+   you shrink your window down things begin to overlap onto one-another. To fix this, 
+   I had to make the outer most panel a fixed pixel size. To improve this design, it would
+   be best to determine the screen and window size of the users computer and 
+   span the pixels accordingly.
+
+   A few days later... February 16 - Did a major refactoring to fix the problem of window 
+   resizing... what a pain in the butt. It's pretty good now and seems to size properly,
+   and via min width and height I'm able to prevent complete collapsing.
+
+*/
+
+
+/*##################################################################*/
+body                    
+               { 
+                   background-color: blue;
+                   font-family: sans-serif;
+               }
+  
+html                    
+               { 
+                   background-color: blue;
+                   font-family: sans-serif;
+               }
+             
+.date                    
+               { 
+                   font-weight: bolder;
+               }
+               
+*:hover                  
+               { 
+                   background-color: yellow;
+               }
+               
+body:hover                  
+               {
+                   background-color: blue;
+               }
+               
+html:hover                  
+               {
+                   background-color: blue;
+               }
+               
+               
+               
+/*##################################################################*/
+div.fullEncapsulatingPane   
+               {
+                    background-color: white;
+                    border-width: 4px;
+                    border-color: black;
+                    border-style: solid;
+                    box-sizing: border-box;
+                    position: absolute;
+                    top: 1%;
+                    bottom: 1%;
+                    right: 2%;
+                    left: 2%;
+                    min-height: 800px;
+                    min-width:  800px;
+                     
+               }
+
+.fullEncapsulatingPane:hover                  
+               {
+                   /*background-color: white;*/
+               }
+               
+/*##################################################################*/               
+div.titlePane       
+               {
+                    position: absolute;
+                    top: 0%;
+                    width: 100%;
+                    height: 15%;
+               }
+
+.titlePane:hover                  
+               {
+                   /*background-color: white;*/
+               }
+               
+/*##################################################################*/                
+div.contentPane       
+               {
+                    position:absolute;
+                    top: 15%;
+                    width: 100%;
+                    height: 85%; 
+               }  
+
+.contentPane:hover                  
+               {
+                   /*background-color: white;*/
+               }
+               
+/*##################################################################*/ 
+div.contentPaneLeft                
+               {
+                    position: absolute;
+                    left: 0%;
+                    height: 98%;
+                    width:  25%;
+               }
+
+.contentPaneLeft:hover                  
+               {
+                   /*background-color: white;*/
+               }
+               
+/*##################################################################*/ 
+div.contentPaneRight                
+               {
+                    position: absolute;
+                    right: 0%;
+                    height: 98%;
+                    width:  75%;
+               }
+
+.contentPaneRight:hover                  
+               {
+                   /*background-color: white;*/
+               }
+
+/*##################################################################*/                
+div.blogPane1  
+               {
+                    position: absolute;
+                    top: 0%;
+                    height: 50%;
+                    width:  100%;
+               } 
+               
+.blogPane1:hover                  
+               {
+                   /*background-color: white;*/
+               }      
+
+/*##################################################################*/                
+div.blogPane2  
+               {
+                    position: absolute;
+                    bottom: 0%;
+                    height: 50%;
+                    width:  100%;
+               } 
+               
+.blogPane2:hover                  
+               {
+                   /*background-color: white;*/
+               }                  
+/*##################################################################*/ 
+div.titleBox       
+               {
+                    background-color: lightblue;
+                    border-width: 1px;
+                    border-color: black;
+                    border-style: solid;
+                    text-align: right;
+                    padding: 5px 20px 5px 5px;
+                    position: absolute;
+                    top: 10px;
+                    bottom: 10px;
+                    right: 10px;
+                    left: 10px;
+               }
+                 
+.titleBox h2      
+               {
+                    font-size: 0.8em;
+                    position: relative;
+                    top: -3ex;
+               }           
+               
+/*##################################################################*/ 
+
+div.friendBox        
+               {
+                    background-color: purple;
+                    border-width: 4px;
+                    border-color: black;
+                    border-style: solid;
+                    text-align: left;
+                    color: white;
+                    padding: 2% 1% 2% 4%;
+                    position: absolute;
+                    top: 10px;
+                    right: 5px;
+                    left: 10px;
+                  
+               }
+.friendBox ul      
+               {
+                    font-size: 1.5em;
+               }
+
+.friendBox a      
+               {
+                    text-decoration: none;
+                    color: white;
+               } 
+               
+.friendBox a:hover      
+               {
+                    text-decoration: underline;
+                    color: red;
+               } 
+               
+/*##################################################################*/
+
+div.blogBox        
+               {
+                    background-color: lightgreen;
+                    border-width: 2px;
+                    border-color: black;
+                    border-style: solid;
+                    text-align: left;
+                    color: black;
+                    padding: 2% 1% 2% 4%;
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    left: 5px;
+                    bottom: 10px;
+                    
+               }
+          
+.blogBox img     
+               {
+                    float: right;
+                    margin: 1% 1% 1% 2%;
+                    height: 60%;
+                    width:  20%;
+               } 
+               
+.blogBox p     
+               {
+                    text-align: justify;
+               } 
+
+/*##################################################################*/

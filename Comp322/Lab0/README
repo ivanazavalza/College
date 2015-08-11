@@ -1,0 +1,99 @@
+    ___                     ________       ________      ________  _________   
+   |\  \                   |\   ____\     |\   __  \    |\  _____\|\___   ___\ 
+   \ \  \    ____________  \ \  \___|_    \ \  \|\  \   \ \  \__/ \|___ \  \_| 
+ __ \ \  \  |\____________\ \ \_____  \    \ \  \\\  \   \ \   __\     \ \  \  
+|\  \\_\  \ \|____________|  \|____|\  \    \ \  \\\  \   \ \  \_|      \ \  \ 
+\ \________\                   ____\_\  \    \ \_______\   \ \__\        \ \__\
+ \|________|                  |\_________\    \|_______|    \|__|         \|__|
+                              \|_________|                                     
+                                                                               
+                                                                               
+
+	   _____    ____    __  __   _____    ____    ___    ___  
+	  / ____|  / __ \  |  \/  | |  __ \  |___ \  |__ \  |__ \ 
+	 | |      | |  | | | \  / | | |__) |   __) |    ) |    ) |
+	 | |      | |  | | | |\/| | |  ___/   |__ <    / /    / / 
+	 | |____  | |__| | | |  | | | |       ___) |  / /_   / /_ 
+	  \_____|  \____/  |_|  |_| |_|      |____/  |____| |____|
+		                                                  
+
+
+			    Created By: Jared Fowler
+			       August 26, 2014
+			CSUN Comp 322L ; Prof. Fitzgerald
+
+
+###################################################################################
+
+╔╦╗┌─┐┬┌─┬┌┐┌┌─┐  ╔═╗┌─┐┌┐┌┌─┐┌─┐  ┌─┐┌─┐  ╔═╗┌┐┌┌─┐┌─┐  ┌─┐┌┐┌┌┬┐  ╔═╗┌─┐┬─┐┌─┐┌─┐
+║║║├─┤├┴┐│││││ ┬  ╚═╗├┤ │││└─┐├┤   │ │├┤   ║ ║│││├┤ └─┐  ├─┤│││ ││  ╔═╝├┤ ├┬┘│ │└─┐
+╩ ╩┴ ┴┴ ┴┴┘└┘└─┘  ╚═╝└─┘┘└┘└─┘└─┘  └─┘└    ╚═╝┘└┘└─┘└─┘  ┴ ┴┘└┘─┴┘  ╚═╝└─┘┴└─└─┘└─┘
+
+###################################################################################
+
+ABOUT:
+
+A command line tool that will read a series of 1's and 0's from a file or stdin.  
+For each line of 8 bits this program will spit out: 
+
+Original Value, 
+ASCII char, 
+Decimal Value, 
+EVEN or ODD parity, 
+Error in parity assuming that we are using EVEN parity.
+
+###################################################################################
+
+STATUS:
+
+August 31, 2014 - Fully functional according to program requirements and tested.
+
+###################################################################################
+
+USAGE:
+
+
+$ cat <fileName1> <fileName2> ... | ./<programName>
+
+or
+
+$ echo 100100010110101 | ./programName
+
+or
+
+$ ./programName inputFileName
+
+NOTE: One might try to input both stdin and a file, but this program will currently
+only look to handle one or the other.  A file passed in will, at this time, 
+take priority.
+
+###################################################################################
+
+UPDATE LOG:
+
+September 2, 2014
+
+-Changed the makefile to output the program name as "zero-one". This is according to Prof. specifications for the lab.
+
+
+August 28, 2014
+
+-Incorporated the ability to read stdin if the input file is not found or the argument "-" is passed.  Minor errors were
+ fixed including subtracting '0' from read ASCII chars in order to get a true 1 or 0 decimal value.  Program has been tested
+ and works!
+
+
+August 27, 2014
+
+-Incorporated the ability to read a file from terminal.  Program should be called in this manner:  pgrmName fileName.txt (Windows)
+ Also added a constant special char array for char symbols such as "space", "DEL", etc. Seems to work fine!
+
+
+August 26, 2014
+
+-Introduction to gitHub, Linux, terminal, etc. The lab1 project is now implemented with basic functionality which can
+ convert an 8 byte array representing 8 bits into a decimal or ASCII value.  A parity finding function was also added.
+ These functions have been tested and are working. 
+
+
+                                                          

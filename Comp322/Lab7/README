@@ -1,0 +1,117 @@
+    ___                     ________       ________      ________  _________   
+   |\  \                   |\   ____\     |\   __  \    |\  _____\|\___   ___\ 
+   \ \  \    ____________  \ \  \___|_    \ \  \|\  \   \ \  \__/ \|___ \  \_| 
+ __ \ \  \  |\____________\ \ \_____  \    \ \  \\\  \   \ \   __\     \ \  \  
+|\  \\_\  \ \|____________|  \|____|\  \    \ \  \\\  \   \ \  \_|      \ \  \ 
+\ \________\                   ____\_\  \    \ \_______\   \ \__\        \ \__\
+ \|________|                  |\_________\    \|_______|    \|__|         \|__|
+                              \|_________|                                     
+                                                                               
+                                                                               
+
+	   _____    ____    __  __   _____    ____    ___    ___  
+	  / ____|  / __ \  |  \/  | |  __ \  |___ \  |__ \  |__ \ 
+	 | |      | |  | | | \  / | | |__) |   __) |    ) |    ) |
+	 | |      | |  | | | |\/| | |  ___/   |__ <    / /    / / 
+	 | |____  | |__| | | |  | | | |       ___) |  / /_   / /_ 
+	  \_____|  \____/  |_|  |_| |_|      |____/  |____| |____|
+		                                                  
+
+
+			    Created By: Jared Fowler
+			       November 13, 2014
+			CSUN Comp 322L ; Prof. Fitzgerald
+
+
+###################################################################################
+
+   _                        _                                         __ _            _                 _   
+  /_\  ___ _   _ _ __   ___| |__  _ __ ___  _ __   ___  _   _ ___    /__\ | ___ _ __ | |__   __ _ _ __ | |_ 
+ //_\\/ __| | | | '_ \ / __| '_ \| '__/ _ \| '_ \ / _ \| | | / __|  /_\ | |/ _ \ '_ \| '_ \ / _` | '_ \| __|
+/  _  \__ \ |_| | | | | (__| | | | | | (_) | | | | (_) | |_| \__ \ //__ | |  __/ |_) | | | | (_| | | | | |_ 
+\_/ \_/___/\__, |_| |_|\___|_| |_|_|  \___/|_| |_|\___/ \__,_|___/ \__/ |_|\___| .__/|_| |_|\__,_|_| |_|\__|
+           |___/                                                               |_|                          
+
+###################################################################################
+
+ABOUT:
+    The idea of the project is to experiment with the run-time balances of paging. Based upon
+personal experiment with this project's programs, it seems as though too many pages 
+results in the constant need for paging due to page faults. On the other hand, spreading
+a continuous data reading accross a group of pages seem to slow things down as well. The optimal
+seems to be around utilizing 1 complete page per data read.
+    The side effect of the experiment is an NxN matrix which is increased with a scalar value.
+
+###################################################################################
+
+STATUS:
+
+-November 14, 2014 : Fully implimented, tested, and works great!
+
+###################################################################################
+
+USAGE:
+
+ matrix_gen:
+
+  $ matrix_gen <size> > <fileName>.size
+
+    -size represents the number of rows and columns in an size * size matrix
+    -filename represents the user defined file name in which matrix_gen should write to
+       -Note the .size . This is to help the user remember how many values were written.
+
+  $ matrix_add <size> <blocks> < <fileName.size> > <fileName.size>
+
+    -blocks represents how many times we wish to divide the matrix. blocks needs to evenly divide size
+    -note that the process inputs from stdin and writes to stdout
+
+  $ jwfLab7_decoder <file.size>
+
+    -outputs via stdout the ascii representation of a decoded file from matrix_gen and matrix_add
+
+
+###################################################################################
+
+UPDATE LOG:
+
+November 16, 2014
+
+-Some fixes to matrix_add. Retested:
+
+size = 10240  @ 1K integers per page
+
+blocks     time (seconds)
+
+1          47
+2          10
+5          11
+10         11
+20         12
+40         11
+80         9
+160        10
+640        27
+1280       51
+10240      120+
+
+
+November 14, 2014
+
+-matrix_add has been completed, tested, and works fine. I decided to output the integer
+values in their raw byte format, that is, i do not output them in a readable ascii value. This
+allows me to be fully deterministic about what I'm reading in based upon bytes per integer.
+In order to test the validity of these values, I created an extra decoder function which 
+takes in one of my coded files as an argument and outputs it via stdout in a readable ascii
+style. The overall concept of the project wasn't that hard to understand, but there were 
+some obstacles which took hours to get over. Lessons learned in particular include: aio_read and
+write do not update the file offset, you have to do it manually. Using bit operators can be
+somewhat tricky as c might mis-interpret a value. For example, a char may be mistaken for
+a signed integer. (See decoder file for details on how this was fixed). 
+
+
+November 13, 2014
+
+-Completed the creation of matrix_gen, which generates random numbers which represent
+an NxN matrix. Appropriate error checks have also been added. Tested and works great.
+
+

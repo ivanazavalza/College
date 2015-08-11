@@ -1,0 +1,72 @@
+Microsoft Windows [Version 6.3.9600]
+(c) 2013 Microsoft Corporation. All rights reserved.
+
+C:\Users\Jared>cd Desktop
+
+C:\Users\Jared\Desktop>CrpytographyTools
+Cryptography Analyzer by Jared Fowler
+
+
+
+1. External File Letter Count Analysis
+2. Cipher Letter Analysis, Simple Shift, and Guess
+3. Decypher Message (Simple Shift and Columnar Transposition)
+
+9. Create Word Bank
+0. Quit
+
+Choice: 1
+
+
+Input File: US.dic
+Output File: dicOut.txt
+
+DONE.
+
+1. External File Letter Count Analysis
+2. Cipher Letter Analysis, Simple Shift, and Guess
+3. Decypher Message (Simple Shift and Columnar Transposition)
+
+9. Create Word Bank
+0. Quit
+
+Choice: 2
+
+
+DONE.
+
+1. External File Letter Count Analysis
+2. Cipher Letter Analysis, Simple Shift, and Guess
+3. Decypher Message (Simple Shift and Columnar Transposition)
+
+9. Create Word Bank
+0. Quit
+
+Choice: 3
+
+
+Which Cipher?
+ Enter 'b' for Best 3 Guess(es), 'a' for all, or a specific offset 0-25. : b
+
+
+
+
+          <========================99%========================>
+
+My guesses are:
+
+BEHAPPYFORTHEMOMENTTHISMOMENTISYOURLIFEBYKHAYYAMOHANDALSOTHISCLASSISREALLYFUN
+
+DONE.
+
+1. External File Letter Count Analysis
+2. Cipher Letter Analysis, Simple Shift, and Guess
+3. Decypher Message (Simple Shift and Columnar Transposition)
+
+9. Create Word Bank
+0. Quit
+
+Choice: 0
+
+
+Good-Bye

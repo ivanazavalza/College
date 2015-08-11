@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<!--Created By: Jared Fowler-->
+<!--*****March 28, 2015*****-->
+<!--Comp 484 ; Prof. Kaplan -->
+
+<!--      __          -->
+<!--    '/  )  _ _    -->
+<!--   /(__\(/(-/ (/  -->
+<!-- _/           /   -->
+
+<!--Summary: Create a geography quiz of CSUN's campus
+    utilizing Google Maps.
+-->
+
+<html>
+   <head>
+      <!--*********************-->
+      <!--*CSS*****************-->
+      <!--*********************-->
+      <style type="text/css">
+         html       { height: 100%; }
+         body       { height: 100%; margin: 0; padding: 0; }
+         #_mapPanel { height: 100%; }
+         .correct   { color: green; }
+         .incorrect { color: red; }
+         .result    {
+            position: absolute;
+            top: 0%;
+            left: 0%;
+            display: none;
+            z-index: 1;
+            padding: 2%;
+            margin: 2%;
+            background-color: yellow;
+         }
+      </style>
+      <!--*********************-->
+      <!--*GoogleMapAPI********-->
+      <!--*********************-->
+      <script type="text/javascript"
+         src ="https://maps.googleapis.com/maps/api/js?sensor=false">
+      </script>
+      <!--*********************-->
+      <!--*jQueryAPI***********-->
+      <!--*********************-->
+      <script type="text/javascript"
+         src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js">
+      </script>
+      <!--*********************-->
+      <!--*JavaScript/jQuery***-->
+      <!--*********************-->
+      <script type="text/javascript">
+         //Some 'constant' values-----------------------------------------------
+         var _longitude = -118.529367  //Logitude of Oviatt Library
+         var _latitude  = 34.240027    //Latitude of Oviatt Library
+         var _zoom      = 17;
+         var _pauseTime = 1500;
+         var _QA        = [
+            {q:"Where is Jacaranda Hall?",aLatMin:"34.241020",aLatMax:"34.242098",aLonMin:"-118.529549",aLonMax:"-118.527789"},
+            {q:"CSUN's tallest building?",aLatMin:"34.238421",aLatMax:"34.239149",aLonMin:"-118.530343",aLonMax:"-118.530091"},
+            {q:"Star Fleet Academy in the recent Star Trek movie?",aLatMin:"34.239632",aLatMax:"34.240435",aLonMin:"-118.530078",aLonMax:"-118.528511"},
+            {q:"Which hall is named 'Little Apple' in spanish?",aLatMin:"34.237574",aLatMax:"34.237854",aLonMin:"-118.530636",aLonMax:"-118.529423"},
+            {q:"CubeSat team's food/coffee stop?",aLatMin:"34.241032",aLatMax:"34.241318",aLonMin:"-118.529769",aLonMax:"-118.529544"}
+         ];
+         
+         //Variables------------------------------------------------------------
+         var map;
+         var _qCount = 0;
+         var _numCorrect = 0;
+         
+         //Functions------------------------------------------------------------
+         //###############################################################
+         //Appends a quiz question to display div as indicated by argument
+         function _nextQuestion(qNum){
+            $("#_displayPanel").html("<h1>" + _QA[qNum].q + "</h1>");
+         }
+         //###############################################################
+         //Returns true if provided point is within provide area
+         function _pointInsideRegion(xPos,yPos,xMin,xMax,yMin,yMax){
+            //Determines if a given point is inside a region of space
+            if((xPos >= xMin) && (xPos <= xMax) && (yPos >= yMin) && (yPos <= yMax))
+               return true;
+            else
+               return false;
+         }
+         //###############################################################
+         //Appends correct/incorrect message to display div
+         function _answerCorrect(isCorrect){
+            //Displays if answer is correct or not.
+            if(isCorrect == true){
+               $("#_displayPanel").append('<h2 class="correct">CORRECT!</h2>');
+            }
+            else{
+               $("#_displayPanel").append('<h2 class="incorrect">INCORRECT.</h2>');
+            }
+         }
+         //###############################################################
+         //Places a rectangle in google map based upon coords and class
+         function _drawGoogleMapRectangle(xMin,xMax,yMin,yMax,color){
+            var trace = [
+               new google.maps.LatLng(yMin, xMin),
+               new google.maps.LatLng(yMin, xMax),
+               new google.maps.LatLng(yMax, xMax),
+               new google.maps.LatLng(yMax, xMin),
+               new google.maps.LatLng(yMin, xMin)];
+               
+            var tracePath = new google.maps.Polyline({
+               path:trace,
+               strokeColor:color,
+               strokeOpacity:1,
+               strokeWeight:2
+            });  
+            
+            tracePath.setMap(map);
+         }
+         //###############################################################
+         //Handles the 'flying div' which gives final score message
+         function _finalScore(numCorrect, total){
+            $("#_resultPanel").addClass("result");
+            $("#_resultPanel").html("<h2>" + numCorrect + "/" + total + " Correct</h2>");
+            //Let's have some fun:
+            if(numCorrect == total){
+               $("#_resultPanel").append("<h3>Hooray!</h3>");
+            }
+            else if(numCorrect == 0){
+               $("#_resultPanel").append("<h3>Sucker</h3>");
+            }
+            $("#_resultPanel").fadeIn(4000);
+         }
+         //###############################################################
+         //Pauses javascript code for 'n' miliseconds
+         function _pause(n){
+            var timeS = Date.now();
+		      while(true){
+		         if((Date.now() - timeS) >= n)
+		            break;
+		       }
+         }
+         //Event Handlers-------------------------------------------------------
+         function _dblClickHandler(e){
+		      //User is answering a question?
+		      if(_qCount < _QA.length){
+		      
+		         var v = _QA[_qCount];
+		      
+		         //Has the user dbl-clicked wihin the correct area?
+		         if(_pointInsideRegion(e.latLng.lng(), e.latLng.lat(), v.aLonMin, 
+		            v.aLonMax, v.aLatMin, v.aLatMax) == true)
+		         {  //Correct answer
+		            //Draw green box around area
+		            _drawGoogleMapRectangle(v.aLonMin,v.aLonMax,v.aLatMin,v.aLatMax,"green");
+		            //Display result text
+		            _answerCorrect(true);
+		            //Update number of correct answers
+		            _numCorrect += 1;
+		         }
+		         else
+		         {  //Incorrect answer
+		            //Draw red box around area
+		            _drawGoogleMapRectangle(v.aLonMin,v.aLonMax,v.aLatMin,v.aLatMax,"red");
+		            //Display result text
+		            _answerCorrect(false);
+		         }
+		         
+		         //Was this the last quiz question?
+		         _qCount += 1;
+		         if(_qCount >= _QA.length){
+		            setTimeout(function(){
+		               $("#_displayPanel").empty();
+		               _finalScore(_numCorrect, _qCount);}, 
+		            _pauseTime);
+		         }
+		         else{
+		            //Display the next question
+		            setTimeout(function(){_nextQuestion(_qCount);}, _pauseTime);
+		         }
+		      }
+		      //Else, do nothing...
+         }
+      
+         //Initialization Function----------------------------------------------
+         $(document).ready(function(){
+            //Set up google map (including configs to make it stationary)
+            var mapOptions = {
+               zoom: _zoom,
+               disableDefaultUI:true,
+               draggable: false,
+               scrollwheel: false,
+               disableDoubleClickZoom: true,
+               center: new google.maps.LatLng(_latitude, _longitude),
+               mapTypeId: google.maps.MapTypeId.ROADMAP
+            }
+            map = new google.maps.Map(document.getElementById("_mapPanel"), mapOptions);
+            //Set Event Handlers
+            google.maps.event.addListener(map, 'dblclick', _dblClickHandler);
+            //Begin the quiz
+            _nextQuestion(0);
+         });
+         
+      </script>
+   </head>
+   <body>
+      <div id="_displayPanel"></div>
+      <div id="_mapPanel"></div>
+      <div id="_resultPanel"></div>
+   </body>
+</html>

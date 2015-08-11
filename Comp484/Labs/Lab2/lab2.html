@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+
+<!--Created By: Jared Fowler-->
+<!--*****March 7, 2015******-->
+<!--Comp 484 ; Prof. Kaplan -->
+
+<!--    ___                  _____           _       _    --> 
+<!--   |_  |                /  ___|         (_)     | |   -->
+<!--     | | __ ___   ____ _\ `--.  ___ _ __ _ _ __ | |_  -->
+<!--     | |/ _` \ \ / / _` |`--. \/ __| '__| | '_ \| __| -->
+<!-- /\__/ / (_| |\ V / (_| /\__/ / (__| |  | | |_) | |_  -->
+<!-- \____/ \__,_| \_/ \__,_\____/ \___|_|  |_| .__/ \__| -->
+<!--                                          | |         -->
+<!--                                          |_|         -->
+
+<html>
+
+   <head>
+      <meta charset = "utf-8">
+      <title>Lab2 - JavaScript</title>
+
+      <!-- *****************************Internal CSS***************************** -->
+      <!-- ********************************************************************** -->
+      <style>
+      
+         body {
+            background-color: red;
+         }
+      
+         #_mainForm {
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            right: 5%;
+            padding: 10% 10% 10% 10%;
+            background-color: #123456;
+         
+         }
+
+         #_calcPanel {
+            width: 50%;
+            padding: 2% 2% 2% 2%;
+         }
+
+         #_calcResult {
+            width: 50%;
+         }
+
+         #_button_save {
+            width: 80%;
+            margin-left: 10%;
+            background-color: green;
+         }
+ 
+         #_button_c {
+            background-color: red;
+         }
+
+         #_errorMessage {
+            color: red;
+         }
+         
+         #div_errorMessage {
+            background-color: yellow;
+            color: red;
+            width: 50%
+         }
+         
+         .button {
+            background-color: orange;
+            width: 23%;
+            margin: 1% 0% 1% 0%;
+         }
+
+      </style>
+
+      <!-- *************************Internal JAVA-SCRIPT************************* -->
+      <!-- ********************************************************************** -->
+      <script type="text/javascript">
+      <!--
+         //"Constants"
+         var BIO_MAX_WORDS = 25;
+         var BACK_SPACE = 8;
+
+         //Object Handles
+         var firstName_h;
+         var lastName_h;
+         var studentID_h;
+         var biography_h;
+         var calcResult_h;
+         var c_1_h, c_2_h, c_3_h, c_4_h, c_5_h, c_6_h, 
+             c_7_h, c_8_h, c_9_h, c_0_h, c_a_h, c_s_h,
+             c_m_h, c_d_h, c_e_h, c_c_h;
+         var saveButton_h;
+         var errorMessage_h;
+         var hoursWorked_h;
+         var submitButton_h;
+         var messageBox_h;
+
+         //Global switches
+         var calcError = false;
+         var newNum = true;
+         var operand1 = "";
+         var operator = "";
+         var calcTypeMode = false;
+
+         /*NOTE: Ideas and some code taken from 484 slides, and other ideas taken
+         **from internet sources but no code copied.*****************************/
+         //----------------------------------------------------------------------
+         //keydown handler which allows input of only letters.
+         //----------------------------------------------------------------------
+         function keyHandler_lettersOnly( e )
+         {
+            var keycode = e.keyCode;
+            var keychar = String.fromCharCode(keycode);
+            if(!((keychar >= 'a' && keychar <= 'z') || (keychar >= 'A' && keychar <='Z') || (keycode == BACK_SPACE)))
+               e.preventDefault();
+         }
+         //----------------------------------------------------------------------      
+         //Automatically capitalizes the first letter of a string
+         //----------------------------------------------------------------------
+         function keyHandler_capitalizeFirstChar( e )
+         {
+            var name = e.target.value;
+            name = name.charAt(0).toUpperCase() + name.slice(1);
+            e.target.value = name;
+         }
+         //----------------------------------------------------------------------
+         //keydown handler which allows input of only digits. This doesn't seem 
+         //to work with firefox for the numeric pad... at least on my laptop.
+         //----------------------------------------------------------------------
+         function keyHandler_digitsOnly( e )
+         {
+            var keycode = e.keyCode;
+            var keychar = String.fromCharCode(keycode);
+            if(!((keychar >= '0' && keychar <= '9') || (keycode == BACK_SPACE)))
+               e.preventDefault();
+         }
+         //----------------------------------------------------------------------
+         //keydown handler which counts number of words via number of white spaces.
+         //Limits the number of words in the string. This does not check against
+         //copy and paste attacks.
+         //----------------------------------------------------------------------
+         function keyHandler_N_wordsOnly( e )
+         {
+            var N = BIO_MAX_WORDS;
+            var spaceCount = 0;
+            var string = e.target.value;
+
+            for(var i = 0; i < string.length; i++)
+            {
+               if(string.charAt(i) == ' ')
+               {
+                  spaceCount += 1;
+
+                  if(spaceCount >= N - 1)
+                  {
+                     var keycode = e.keyCode;
+                     var keychar = String.fromCharCode(keycode);
+                     if(keychar == ' ')
+                     {
+                        e.preventDefault();
+                        return;
+                     }
+                  }
+               }
+            }
+         }
+         //----------------------------------------------------------------------
+         //Upon typing into the calc result, the field is first cleared
+         //----------------------------------------------------------------------      
+         function keyHandler_calcResult( e )
+         {
+            if(calcTypeMode == false)
+            {
+               calcResult_h.value = "";
+               calcTypeMode = true;
+            }
+         }
+         //----------------------------------------------------------------------
+         //Transfers results from calculator result to the span labeled "Hours Worked
+         //This Week. Will only transfer if result is a valid number.
+         //----------------------------------------------------------------------
+         function clickHandler_result_to_hoursWorked( e )
+         {
+            var result = Number(calcResult_h.value);
+
+            //Is the result a valid number?
+            if(isNaN(result) || calcResult_h.value == "")
+            {
+               //If not, print out error message and reset hours worked
+               errorMessage_h.innerHTML = "ERROR. Invalid Number: Hours Worked This Week";
+               hoursWorked_h.innerHTML = "Hours Worked This Week: ";
+            }
+            else //Valid numerical result
+            {
+               hoursWorked_h.innerHTML = "Hours Worked This Week: " + result;
+               errorMessage_h.innerHTML = "";
+            }
+         }
+         //----------------------------------------------------------------------
+         //CHecks all of the input fields for valid data. Builds up both an error
+         //string and a alert box string. If a single error occurs, the error string
+         //is displayed, else, the alert box is displayed.
+         //----------------------------------------------------------------------
+         function clickHandler_submit( e )
+         {
+            var NO_ERROR_COLOR = "white";
+            var ERROR_COLOR = "yellow";
+            
+            var alertOut = "";
+            var htmlOut = "";
+            var noError = true;
+            
+            //Check First Name
+            if(firstName_h.value == "")  //Empty String
+            {
+               noError = false;
+               document.getElementById("_firstName").style.backgroundColor = ERROR_COLOR;
+               htmlOut += "<p>ERR First Name: No Input</p>";
+            }
+            else if(!lettersOnly(firstName_h.value))  //Not all letters
+            {
+               noError = false;
+               document.getElementById("_firstName").style.backgroundColor = ERROR_COLOR;
+               htmlOut += "<p>ERR First Name: Not Letters Only</p>";
+            }
+            else if(!firstLetterCapitalized(firstName_h.value)) //First letter not capitalized
+            {
+               noError = false;
+               document.getElementById("_firstName").style.backgroundColor = ERROR_COLOR;
+               htmlOut += "<p>ERR First Name: First Letter Not Capitalized</p>";
+            }
+            else //No error
+            {
+               document.getElementById("_firstName").style.backgroundColor = NO_ERROR_COLOR;
+               alertOut += "First Name: " + firstName_h.value + "\n";
+            }
+            //Check Last Name
+            if(lastName_h.value == "")  //Empty String
+            {
+               noError = false;
+               document.getElementById("_lastName").style.backgroundColor = ERROR_COLOR;
+               htmlOut += "<p>ERR Last Name: No Input</p>";
+            }
+            else if(!lettersOnly(lastName_h.value))  //Not all letters
+            {
+               noError = false;
+               document.getElementById("_lastName").style.backgroundColor = ERROR_COLOR;
+               htmlOut += "<p>ERR Last Name: Not Letters Only</p>";
+            }
+            else if(!firstLetterCapitalized(lastName_h.value)) //First letter not capitalized
+            {
+               noError = false;
+               document.getElementById("_lastName").style.backgroundColor = ERROR_COLOR;
+               htmlOut += "<p>ERR Last Name: First Letter Not Capitalized</p>";
+            }
+            else //No error
+            {
+               document.getElementById("_lastName").style.backgroundColor = NO_ERROR_COLOR;
+               alertOut += "Last Name: " + lastName_h.value + "\n";
+            }
+            //Check Student ID
+            if(studentID_h.value == "")  //Empty String
+            {
+               noError = false;
+               document.getElementById("_studentID").style.backgroundColor = ERROR_COLOR;
+               htmlOut += "<p>ERR Student ID: No Input</p>";
+            }
+            else if(!digitsOnly(studentID_h.value))  //Not all numbers
+            {
+               noError = false;
+               document.getElementById("_studentID").style.backgroundColor = ERROR_COLOR;
+               htmlOut += "<p>ERR Student ID: Not Digits Only</p>";
+            }
+            else if(!fullFieldUsed(studentID_h))  //Not all 9 digits entered
+            {
+               noError = false;
+               document.getElementById("_studentID").style.backgroundColor = ERROR_COLOR;
+               htmlOut += "<p>ERR Student ID: Not 9 Digits Long</p>";
+            }
+            else //No error
+            {
+               document.getElementById("_studentID").style.backgroundColor = NO_ERROR_COLOR;
+               alertOut += "Student ID: " + studentID_h.value + "\n";
+            }
+            //Check Biography
+            if(biography_h.value == "")  //No Input
+            {
+               noError = false;
+               document.getElementById("_biography").style.backgroundColor = ERROR_COLOR;
+               htmlOut += "<p>ERR Biography: No Input</p>";
+            }
+            else if(!lessThan_N_words(biography_h.value))  //More than max number of words?
+            {
+               noError = false;
+               document.getElementById("_biography").style.backgroundColor = ERROR_COLOR;
+               htmlOut += "<p>ERR Biography: Number Words Over Limit</p>";
+            }
+            else  //No error
+            {
+               document.getElementById("_biography").style.backgroundColor = NO_ERROR_COLOR;
+               alertOut += "Biography: " + biography_h.value + "\n";
+               
+            }
+            //Check Hours Worked This Week
+            if(hoursWorked_h.innerHTML != "Hours Worked This Week: ")
+               alertOut += hoursWorked_h.innerHTML + "\n";
+            //Calculator Result
+            alertOut += "Calculator Result: " + calcResult_h.value + "\n";
+         
+            if(noError)
+            {
+               //Clear error codes
+               messageBox_h.innerHTML = "";
+               //Add final additions to the alert message and display
+               alertOut += "Submission Successful!\n";
+               alert(alertOut);
+            }
+            else
+            {
+               messageBox_h.innerHTML = htmlOut;
+            }
+         }
+         //----------------------------------------------------------------------
+         //Returns true if the passed in string is only composed of letters
+         //----------------------------------------------------------------------
+         function lettersOnly( string )
+         {
+            for(var i = 0; i < string.length; i++)
+            {
+               var keychar = string.charAt(i);
+               if(!((keychar >= 'a' && keychar <= 'z') || (keychar >= 'A' && keychar <='Z')))
+                  return false;
+            }
+            return true;
+         }
+         //----------------------------------------------------------------------
+         //Returns true if the first letter of the passed in string is capitalized
+         //----------------------------------------------------------------------
+         function firstLetterCapitalized( string )
+         {
+            if(!(string.charAt(0) >= 'A' && string.charAt(0) <= 'Z'))
+               return false;
+            return true;
+         }
+         //----------------------------------------------------------------------
+         //Return true if the max length of the field is being used.
+         //----------------------------------------------------------------------
+         function fullFieldUsed( field )
+         {
+            if(field.maxLength != field.value.length)
+               return false;
+            return true;
+         }
+         //----------------------------------------------------------------------
+         //Returns true if the passed in string is composed of digits only.
+         //----------------------------------------------------------------------
+         function digitsOnly( field )
+         {
+            for(var i = 0; i < field.length; i++)
+            {
+               if(!(field.charAt(i) >= '0' && field.charAt(i) <= '9'))
+                  return false;
+            }
+            return true;
+         }
+         //----------------------------------------------------------------------
+         //Returns true if the passed in string has less than or equal to N white 
+         //spaces.
+         //----------------------------------------------------------------------
+         function lessThan_N_words( string )
+         {
+            var N = BIO_MAX_WORDS;
+            var spaceCount = 0;
+            for(var i = 0; i < string.length; i++)
+            {
+               if(string.charAt(i) == ' ')
+               {
+                  spaceCount += 1;
+
+                  if(spaceCount >= N)
+                  {
+                     return false;
+                  }
+               }
+            }
+            return true;
+         }
+         //----------------------------------------------------------------------
+         //Simple handler for the submit button which stops the page from being refreshed.
+         //----------------------------------------------------------------------
+         function submitHandler( e )
+         {
+            e.preventDefault();
+         }
+         //----------------------------------------------------------------------
+         //Calculator clear button resets fields, switches, and values.
+         //----------------------------------------------------------------------
+         function clickHandler_clearButton( e )
+         {
+            calcTypeMode = false;
+            calcResult_h.value = "";
+            operand1 = "";
+            operator = "";
+            newNum = true;
+            calcError = false;
+         }
+         //----------------------------------------------------------------------
+         //Handles all numerical button click events.
+         //----------------------------------------------------------------------
+         function clickHandler_NumButton( e )
+         {
+            calcTypeMode = false;
+         
+            if(!digitsOnly(calcResult_h.value))
+            {
+               calcResult_h.value = "ERROR: press C";
+               calcError = true;
+               return;
+            }
+            if(calcError)
+            {
+               e.preventDefault();
+               return;
+            }
+            if(newNum)
+            {
+               calcResult_h.value = "";
+               newNum = false;
+            }
+            
+            calcResult_h.value += e.target.value;
+         }
+         //----------------------------------------------------------------------
+         //Handles all operation button click events.
+         //----------------------------------------------------------------------
+         function clickHandler_OpButton( e )
+         {
+            calcTypeMode = false;
+            
+            if(calcError)
+               e.preventDefault();
+               
+            //Invalid Operand?
+            if(!(calcResult_h.value != "" && digitsOnly(calcResult_h.value)))
+            {
+               calcResult_h.value = "ERROR: press C";
+               calcError = true;
+               return;
+            }
+            //Pre-existent operand
+            else if(operand1 != "" && operator != "")
+            {
+               operand1 = performArithmatic(operand1, operator, calcResult_h.value);
+               calcResult_h.value = operand1;
+               operator = e.target.value;
+               newNum = true;
+               return;
+            }
+            //Else, back up the value and the operand and set flag.
+            operand1 = calcResult_h.value;
+            operator = e.target.value;
+            newNum = true;
+         }
+         //----------------------------------------------------------------------
+         //Performs arithmetic operation depending on operator op. Returns the 
+         //result of this operation.
+         //----------------------------------------------------------------------
+         function performArithmatic(o1, op, o2)
+         {
+            if(op == "+")
+               return Math.floor(Number(o1) + Number(o2));
+            else if(op == "-")
+               return Math.floor(Number(o1) - Number(o2));
+            else if(op == "*")
+               return Math.floor(Number(o1) * Number(o2));
+            else if(op == "/")
+               return Math.floor(Number(o1) / Number(o2));
+         }
+         //----------------------------------------------------------------------
+         //Handles the equals button on the calculator.
+         //----------------------------------------------------------------------
+         function clickHandler_EqButton( e )
+         {
+            if(!digitsOnly(calcResult_h.value))
+            {
+               calcResult_h.value = "ERROR: press C";
+               calcError = true;
+               return;
+            }
+            if(calcError || operator == "")
+            {
+               newNum = true;
+               e.preventDefault();
+               return;
+            }
+            
+            operand1 = performArithmatic(operand1, operator, calcResult_h.value);
+            calcResult_h.value = operand1;
+            operator = "";
+            newNum = true;
+            return;
+         }
+         //----------------------------------------------------------------------
+         //Assigns object handles and event handles.
+         //----------------------------------------------------------------------
+         function init()
+         {
+            /*Set up handles and event listeners for individual objects*/
+            
+            //Form
+            document.getElementById("_mainForm").addEventListener("submit", submitHandler, false);
+            
+            //First name input
+            firstName_h = document.getElementById("_firstName");
+            firstName_h.addEventListener("keydown", keyHandler_lettersOnly, false);
+            firstName_h.addEventListener("keyup", keyHandler_capitalizeFirstChar, false);
+
+            //Last name input
+            lastName_h = document.getElementById("_lastName");
+            lastName_h.addEventListener("keydown", keyHandler_lettersOnly, false);
+            lastName_h.addEventListener("keyup", keyHandler_capitalizeFirstChar, false);
+
+            //Student ID input
+            studentID_h = document.getElementById("_studentID");
+            studentID_h.addEventListener("keydown", keyHandler_digitsOnly, false);
+
+            //Biography input
+            biography_h = document.getElementById("_biography");
+            biography_h.addEventListener("keydown", keyHandler_N_wordsOnly, false);
+
+            //Calculator stuff
+            calcResult_h = document.getElementById("_calcResult");
+            calcResult_h.addEventListener("keydown", keyHandler_calcResult, false);
+            
+            c_7_h = document.getElementById("_button_7");
+            c_8_h = document.getElementById("_button_8");
+            c_9_h = document.getElementById("_button_9");
+            c_d_h = document.getElementById("_button_/");
+            c_4_h = document.getElementById("_button_4");
+            c_5_h = document.getElementById("_button_5");
+            c_6_h = document.getElementById("_button_6");
+            c_m_h = document.getElementById("_button_*");
+            c_1_h = document.getElementById("_button_1");
+            c_2_h = document.getElementById("_button_2");
+            c_3_h = document.getElementById("_button_3");
+            c_s_h = document.getElementById("_button_-");
+            c_c_h = document.getElementById("_button_c");
+            c_0_h = document.getElementById("_button_0");
+            c_e_h = document.getElementById("_button_=");
+            c_a_h = document.getElementById("_button_+");
+            
+            c_c_h.addEventListener("click", clickHandler_clearButton, false);
+            c_1_h.addEventListener("click", clickHandler_NumButton, false);
+            c_2_h.addEventListener("click", clickHandler_NumButton, false);
+            c_3_h.addEventListener("click", clickHandler_NumButton, false);
+            c_4_h.addEventListener("click", clickHandler_NumButton, false);
+            c_5_h.addEventListener("click", clickHandler_NumButton, false);
+            c_6_h.addEventListener("click", clickHandler_NumButton, false);
+            c_7_h.addEventListener("click", clickHandler_NumButton, false);
+            c_8_h.addEventListener("click", clickHandler_NumButton, false);
+            c_9_h.addEventListener("click", clickHandler_NumButton, false);
+            c_0_h.addEventListener("click", clickHandler_NumButton, false);
+            c_a_h.addEventListener("click", clickHandler_OpButton, false);
+            c_s_h.addEventListener("click", clickHandler_OpButton, false);
+            c_m_h.addEventListener("click", clickHandler_OpButton, false);
+            c_d_h.addEventListener("click", clickHandler_OpButton, false);
+            c_e_h.addEventListener("click", clickHandler_EqButton, false);
+            
+            //Save Button
+            saveButton_h = document.getElementById("_button_save");
+            saveButton_h.addEventListener("click", clickHandler_result_to_hoursWorked, false);
+
+            //Hours Worked Span
+            hoursWorked_h = document.getElementById("_label_HoursWorkedThisWeek");
+
+            //Error Message Label
+            errorMessage_h = document.getElementById("_errorMessage");
+            
+            //Submit Button
+            submitButton_h = document.getElementById("_button_submit");
+            submitButton_h.addEventListener("click", clickHandler_submit, false);
+            
+            //Message Box
+            messageBox_h = document.getElementById("div_errorMessage");
+         }
+         
+         window.addEventListener("load", init, false);
+      -->
+      </script>
+
+   </head>
+
+   <body>
+
+      <form id ="_mainForm" onSubmit ="submission()" action ="">
+
+         <br><br>
+
+         <!--Label and text field for first name.-->
+         <div id="div_firstName">
+            <label>First Name: </label>
+            <input id="_firstName" type="text" name="firstName"/><br>
+         </div>
+
+         <br><br>
+
+         <!--Label and text field for last name.-->
+         <div id="div_lastName">
+            <label> Last Name: </label>
+            <input id="_lastName" type="text" name="lastName"/><br>
+         </div>
+   
+         <br><br>
+
+         <!--Label and text field for student id number.-->
+         <div id="div_studentID">
+            <label>Student ID: </label>
+            <input id="_studentID" type="text" name="studentID" size="9" maxLength="9"/><br>
+         </div>
+         
+         <br><br>
+
+         <!--Label and text field for biography.-->
+         <div id="div_biography">
+            <label>Biography: (25 Words Max)</label><br>
+            <textarea id="_biography" name="biography" rows="8" cols="50"/></textarea><br>
+         </div>
+         
+         <br><br>
+
+         <!--Create a calculator. Button positions will be handled by CSS-->
+         <div id="_calcPanel">
+
+            <div id="_calcResultPanel">
+               <label>Result: </label>
+               <input id="_calcResult" type="text" name="calcResult"/>
+            </div>
+            <div id="_calcButtonPanel">
+               <input class="button" type="button" id="_button_7" value="7"/>
+               <input class="button" type="button" id="_button_8" value="8"/>
+               <input class="button" type="button" id="_button_9" value="9"/>
+               <input class="button" type="button" id="_button_/" value="/"/>
+               <input class="button" type="button" id="_button_4" value="4"/>
+               <input class="button" type="button" id="_button_5" value="5"/>
+               <input class="button" type="button" id="_button_6" value="6"/>
+               <input class="button" type="button" id="_button_*" value="*"/>
+               <input class="button" type="button" id="_button_1" value="1"/>
+               <input class="button" type="button" id="_button_2" value="2"/>
+               <input class="button" type="button" id="_button_3" value="3"/>
+               <input class="button" type="button" id="_button_+" value="+"/>
+               <input class="button" type="button" id="_button_c" value="c"/>
+               <input class="button" type="button" id="_button_0" value="0"/>
+               <input class="button" type="button" id="_button_=" value="="/>
+               <input class="button" type="button" id="_button_-" value="-"/>
+            </div>
+
+            <!--Button which will save calculator result into the following label.-->
+            <button type="button" id="_button_save">Save</button>
+            
+            <br><br> 
+            
+            <!--Creat a span which keeps number of hours worked, and error message label-->
+            <label id="_errorMessage"></label><br>
+            <span id="_label_HoursWorkedThisWeek">Hours Worked This Week: </span>
+
+         </div>
+
+         <br><br>
+         
+         <!--Error message box for inproper form fields.-->
+         <div id="div_errorMessage"></div>
+
+         <!--End the form with a submit button.-->
+         <input type="submit" id="_button_submit" value="Submit"/>
+
+      </form>
+
+   </body>
+
+</html>

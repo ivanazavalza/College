@@ -1,0 +1,23 @@
+Extra Credit Q/A by Jared Fowler
+Comp 484 w/Prof. Kaplan
+
+Extra Credit 1-------------------------------------------------------------------------------
+Q: How does adblock software disable ads without effecting the remaining functionality of the page?
+
+A: First off, the way an ad-blocker works is gernally based off a black-list filter; there is a set of policies which filter out certain elements of a website.  So how is it that an ad-blocker can function correctly by filtering out unwanted items, while at the same time allowing legit items unfiltered and allowing the page to function properly? From the few forums I've found, my conclusion up to this point is that it doesn't, at least, not always. I found one or two forumns were testimonials were given about how ad-blocker plus, a popular ad-blocking application that I've personally used for the last year or so, caused certain websites to all together fail in functionality.  Ad-blocking software, like any filtering system, is ever evolving and will probably never be completely tuned correctly. It will always have its share of false-negatives, false-potives, and times when it simply causes the page to fail.
+
+Resources:
+https://adblockplus.org/en/faq_internal
+
+
+Extra Credit 2-------------------------------------------------------------------------------
+Q: HSTS 'supercookies'. How are they connected and how can they be used to hurt users?
+
+A: "HTTP Strict Transport Security (HSTS) is a web security policy mechanism which is necessary to protect secure HTTPS websites against downgrade attacks, and which greatly simplifies protection against cookie hijacking." (http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security) Cookie hijacking, also known as session hijaking, is the "exploitation of a valid computer session...to gain unautorized access to information or services in a computer system." (http://en.wikipedia.org/wiki/Session_hijacking) 
+At least one way which HSTS can be used to hurt users comes from privacy issues. Because HSTS causes all connections, with which it is used, to utilize https (even if the user manually types http it will be updated to https), an attacker might utilize this characteristic to determine which sites a particular individual has accessed. I feel like I need a greater explanation to how exactly an attacker might do this, but according to the various sites I've visited, it can be done. Essentially, connect to a server using http and determine if the protocol has been changed to https. Based upon previously placed cookies the server can then analyze your HSTS database and determine different groups of users, or perhaps even down to individuals.
+
+Resources:
+https://nakedsecurity.sophos.com/2015/02/02/anatomy-of-a-browser-dilemma-how-hsts-supercookies-make-you-choose-between-privacy-or-security/
+http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
+http://en.wikipedia.org/wiki/Session_hijacking
+https://news.ycombinator.com/item?id=8830811

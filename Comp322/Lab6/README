@@ -1,0 +1,82 @@
+    ___                     ________       ________      ________  _________   
+   |\  \                   |\   ____\     |\   __  \    |\  _____\|\___   ___\ 
+   \ \  \    ____________  \ \  \___|_    \ \  \|\  \   \ \  \__/ \|___ \  \_| 
+ __ \ \  \  |\____________\ \ \_____  \    \ \  \\\  \   \ \   __\     \ \  \  
+|\  \\_\  \ \|____________|  \|____|\  \    \ \  \\\  \   \ \  \_|      \ \  \ 
+\ \________\                   ____\_\  \    \ \_______\   \ \__\        \ \__\
+ \|________|                  |\_________\    \|_______|    \|__|         \|__|
+                              \|_________|                                     
+                                                                               
+                                                                               
+
+	   _____    ____    __  __   _____    ____    ___    ___  
+	  / ____|  / __ \  |  \/  | |  __ \  |___ \  |__ \  |__ \ 
+	 | |      | |  | | | \  / | | |__) |   __) |    ) |    ) |
+	 | |      | |  | | | |\/| | |  ___/   |__ <    / /    / / 
+	 | |____  | |__| | | |  | | | |       ___) |  / /_   / /_ 
+	  \_____|  \____/  |_|  |_| |_|      |____/  |____| |____|
+		                                                  
+
+
+			    Created By: Jared Fowler
+			       November 7, 2014
+			CSUN Comp 322L ; Prof. Fitzgerald
+
+
+###################################################################################
+
+ _       __           __               __  ___      __     __
+| |     / /___ ______/ /__   ____ _   /  |/  /___  / /__  / /
+| | /| / / __ `/ ___/ //_/  / __ `/  / /|_/ / __ \/ / _ \/ / 
+| |/ |/ / /_/ / /__/ ,<    / /_/ /  / /  / / /_/ / /  __/_/  
+|__/|__/\__,_/\___/_/|_|   \__,_/  /_/  /_/\____/_/\___(_)   
+                                                             
+                         
+###################################################################################
+
+ABOUT:
+
+By creating a Daemon we are able to "wack a mole", that is processes, via sending
+signals which are handled by this daemon. The signals will terminate children
+of the daemon which are conveniently called "moles".
+
+###################################################################################
+
+STATUS:
+
+- November 7, 2014 : Fully functional and tested. Works great!
+
+###################################################################################
+
+USAGE:
+
+ I've found it best to use two terminals when testing this program out.
+
+    Terminal 1: Leave it open at the root directory.
+    Terminal 2: Directory should be the location of spiritd and mole
+
+   -Start the program:  (T2) $ ./spiritd
+   -Check the pid:      (T1) $ ps -ef     (find ./spiritd)
+   -Send signals:       (T1) $ kill -usr1 <pid>    or   $ kill -usr2 <pid>
+   -Keep checking ps:   (T1) $ ps -ef     (look for mole)
+   -Terminate process:  (T1) $ kill -term <pid>
+   -See results:        (T1) $ cat lab6.log
+
+    Note: The output file will be appended to, not overwritten.
+
+
+###################################################################################
+
+UPDATE LOG:
+
+November 7, 2014
+
+-Between yesterday and today I was able to complete this project in about 10 hours time.
+The general idea of the project wasn't very difficult, but I ran into a few problems along
+the way. Amongst these problems included directory managment, file permissions, and debuggin/
+testing pains. The program is riddled with debugging statements that can easily be activated
+by changing the DEBUGGING mode to 1. This program has been made to fork and execute program "mole".
+Mole will output to a log which will be located in the home directory. If mole is called by
+itself, the log will be created in the current working directory. Mole, like its calling program, 
+contains sevearl debug statements that can be activated withh the DEBUGGING option.
+

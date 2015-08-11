@@ -1,0 +1,950 @@
+Comp 424 Notes By: Jared Fowler
+CSUN w/Professor Vahab.
+Book: Security in Computing Edition 4
+
+This is a compilation of notes written by me, Jared Fowler, from my studies of 
+the text book, slides, and external reading assignments, for the purpose of 
+better understanding the material and preparing for the tests.
+
+
+Chapter 1: Is there a Security Problem?
+   -Computing System: Collection of hardware, software, storage media, data, and the users.
+   -Principle of Easiest Penetration: Attacker must be expected to use any available means of penetration. 
+                                      Certainly does not have to be the way we want the attacker to behave.
+                                      This implies that computer security specialists must consider all possible
+                                      means of penetration.
+   -Vulnerability: Weakness in a security system.
+   -Threat: Set of circumstances that have the potential to cause harm, loss, or damage.
+   -Attack: When a human exploits a vulnerability. It can also be when another system overwhelms a victim system with messages, causing the victim to not run well.
+   -Control: Action, device, or procedure which reduces vulnerability.
+   
+   "A threat is blocked by control of a vulnerability."
+   
+   -Threats exist as any of the four kinds: Interception, Interruption, Modification, Fabrication.
+   -Interception: Unauthorized party has gained access to a asset.
+   -Interruption: Asset of the system becomes lost, unavailable, or unusable.
+   -Modification: Interception with modification added to asset.
+   -Fabrication: Counterfeit objects on a computer system. 
+   
+   -Malicious Attacker:
+      -Method: Skills, knowledge, tools, etc.
+      -Opportunity: Time and access.
+      -Motive: Reason why.
+
+   -Computer Security: (CIA)
+      -Confidentiality: Computer assets are only accessed by authorized parties. Sometimes called secrecy or privacy.
+      -Integrity: Assets can only be modified by authorized parties in authorized ways.
+      -Availability: Assets are accessible to authorized parties at appropriate times. Sometimes known as its opposite, denial of service.
+      
+   -Vulnerabilities:
+      -Hardware: Adding, removing, changing devices hooked up. Flooded, burned, etc. Hammers, bombs, knives, etc.
+      -Software: 
+         -Configuration Management: Controls access to software to prevent deletion, destruction, or replacement.
+         -Logic Bomb: Delayed effect of an attack on software (Ex: Changing a probram to stop working on a particular date.)
+         -Trojan Horse: A program that overtly does one thing while covertly doing another.
+         -Virus: Specific type of trojan horse that can be used to spread its infection to another system.
+         -Trapdoor: A program that has a secret entry point.
+         -Information Leaks: Code that makes information accessible to unauthorized people or programs.
+         -Software Theft: Unauthorized copying of software.
+         
+   -Principle of Adequate Protection: Computer items must only be protected only until they lose their value. They must be protected to a degree consistent with their value.
+   -Computer Crime: Any crime involving a computer or aided by the use of one.
+   
+   -Methods of Defense:
+      -Risk: The possibility for harm to occur.
+      -Encryption: Scrambling process to take cleartext and transform it into ciphered text, or ciphertext.
+      -Protocol: Agreed upon series of actions which leads to a desired result.
+      
+   -Principle of Effectiveness: Controls must be used-and used properly-to be effective. They must be efficient, easy to use, and appropriate.
+   -Principle of Weakest Link: Security can be no stronger tha its weakest link. Whether it is the power supply that powers the firewall or the OS, or
+                               the human who plans, implements, and administers controls, etc.
+                               
+      -Overlapping Controls (Layered Defense): Using multiple controls so that if one control fails, others will be present to compensate.
+      
+   -Lecture 1:
+      -Security is a policy and protection is a mechanism. Protection mechanisms implement security policies.
+      -Most vulnerabilities that are actually exploited are based upon trust issues.. overly trusting elements of the computer, either access control model or user.
+      -Threats include: Theft, privacy, destruction, interruption/interference.
+         -Interuption, Modification, Fabrication, Destruction, 
+      -Social Engineering Attacks: Cheap n easy. Giving out passwords over phone, responding to bogus email with credit card number, etc.
+      
+      
+      
+Chapter 2: Elementary Cryptogrfaphy
+   
+   -Encryption: Process of encoding a message so that its meaning is not obvious. (Encode, Encipher)
+   -Decryption: The reverse process of encryption. (Decode, Decipher)
+   -Cryptosystem: A system for encryption and decryption.
+   -Plaintext: Original form of text.
+   -Ciphertext: Encrypted form of text.
+   -Notation:
+      - C = E(P)  :: Ciphertext = Encryption(PlainText)
+      - P = D(C)  :: PlainText = Decryption(Ciphertext)
+   -Symmetric Encryption: Same key used to encrypt and decrypt.
+   -Asymmetric Encryption: Different steps and keys needed to go from P to C and vice-versa.
+   -Keyless Cipher: An encryption scheme that does not require the use of a key.
+   -Cryptography: Hidden writing, using encryption to hide text.
+   -Cryptanalyst: One who studies encryption and hopes to find the hidden meanings.
+   -Cryptographer: One who attempts to translate coded material back to its original form.
+   -Cryptology: Study of both encryption and decryption.
+   -Cryptanalysis: Process of trying to break a cryptosystem without being given the key.
+   
+   -Encryption:
+      -Substitutions: One letter is exchanged for another.
+         -Monoalphabetic: Each plaintext letter maps to a single, unique, ciphertext letter. (One level above shifting)
+         -Polyalphabetic: Ciphers that don't always translate a given plaintext char into the same ciphertext char. For eg, could use different 
+          substitutions for odd and even positioned letters.
+             -Kasiski method tries to find repititions in encryption pattern, where index of coincidence predicts the number of alphabets used...to break this encrytpion.
+      -Transpositions: Order of letters is re-arranged.
+   -Monoalphabetic Cipher (Simple Substitution): Substitute a character or symbol for each character in original message.
+   -Caesar Cipher: First used by Julius Caesar, letters are shifted by a fixed number of places after it in the alphabet.
+   -One Time Pad: A large set of non-repeating keys which are one-time used to both encrypt and decrypt. Both the sender and receiver need a copy of these keys.
+      -This has been proven to be unbreakable if encryption done at bit-level b/c can be 'decrypted' to any plain-text.
+      -Problem is that you need 1 bit of key per 1 bit of message, and it needs to be truly random... which is hard to due other than brute force with a fair coin.
+      -Misuse such as distribution of pads with some other crypto mechanism, non-random, or reused.
+   -Vernam Cipher: Translates Plain Text to numerical equivalent, adds a random number to it, and then mod 26 to produce a final letter.
+   -Book Ciphers: Using materials such as books, music, etc., to form a type of key in encrypt and decrypt a message.
+   
+   -Permutation: Instead of substituting different chars, scramble up the existing chars.
+      -Letter frequency, therefore, will not help cyprtanalyst.
+   -Transpositions:
+      -Columnar Transpositions: Rearrangement of the characters of the plaintext into columns.
+         -To Crack:
+            -Identify if it has been used by determining if the letter frequencies are normal.
+            -Find column size or words by looking at repetitive sets of characters.
+   
+   -Digrams: Pairs of letters that appear very frequently, such as en, re, er, nt, ect. 
+   -Trigrams: Triplets of letters that appear most often, such as ent, ion, and, ing, ive, etc.
+   -Product Cipher: Combination of two ciphers.
+   
+   -Making a "Good" Encryption Algorithm:
+      -Amount of secrecy needed should determine the amount of labor for the encryption and decryption.
+      -Set of keys and the enciphering algorithm should be free from complexity. (aka, should not restrict keys nor plaintext used. Should be just as effective for any sort.)
+      -Implementation of process should be as simple as possible. (Complicated algorithms are prone to error.)
+      -Errors in ciphering should not cause errors in later portions of the cipher.
+      -The size of the enciphered should be no larger than the text of the original message.
+      -Maximize confusion (relation between plain and cipher) and diffusion (distribution of information through ciphertext)
+   -Properties of "Trustworthy" Encryption Systems:
+      -Based on sound mathematics.
+      -Been analysed by competent experts and found to be sound.
+      -Withstood the test of time.
+      
+   -Symmetric and Asymmetric:
+      -Symmetric:
+         -Encryption and authentification performed in a single operation. (Good, but does make signature more difficult)
+         -Faster than asymmetric
+         -Does not require centralized authority.
+         -Key distribution is a huge problem...
+         -Examples include DES and AES.
+         -Authentication: Proof that a message received was not fabricated. Symmetric systems give this authentication, as long as the key remains secret.   
+         -Problem with symmetric keys is key distribution. Keys will be needed for every pair of people. This leads to (n*(n-1)/2) keys needed.
+         -Key Distribution: Way in which keys would need to be distributed in a symmetric system.
+     
+      -Asymmetric is the same as public and private key combo.  See later below...
+      -Key Management: Storing, safeguarding, and activating keys.
+      
+   -Stream and Block Ciphers:
+      -Stream: A character is converted from plaintext immediately into ciphertext. 
+      -Block Cipher: Encrypts a group of plaintext symbols as one block. (This includes Columnar Transposition)
+      -Stream:
+         -Advantages: Speed, Low error propagation (1 error, 1 symbol effected)
+         -Disadvantages: Low Diffusion (ALl information of that char. is stored in one symbol of cipher), Malicious Insertions.
+      -Block:
+         -Advantages: High diffusion, Immunity to insertion.
+         -Slow (Need to wait for block of data before encryption/decryption starts), Error Propagation.      
+   -Confusion: Not allowing the interceptor to predict the results by changing a single letter in plaintext. 
+   -Diffusion: Characteristic of distributing the information from single plaintext letters over the entire output.   
+   
+   -Cipher-Only Attack: when attacker only has the ciphertext publicly available. Hardest type of attack.
+   -Known Plain Text:
+   -Probable Plain Text: Based upon what the message was inteded for, therefore, you can guess what words are present.
+   -Chosen PlainText: Send plaintext through algorithm and study the ciphertext and make comparisons.
+   -Algorithm and ciphertext: Cyrptanalyst konws the algorithm and has a sample of ciphertext. Can do exhaustive runs of algorithm or brute force.
+   -Timing Attacks: Type of encryption might be deduced by timing of encryption/decryption. Also, length or attributes about the key may be deduced from timing.
+   
+   -Data Encryption Standard (DES): (Prof. Vahab: Shouldn't be used now days for anything serious.)
+      -Officially accepted as a cryptographic standard in both the United States and abroad.
+      -Based upon the "Lucifer" algorithm, which had been worked on by IBM, enhanced by NSA.
+      -Proper name is DAE, Data Encryption Algorithm and DAE-1 in other countries.
+      -Build upon the combination of substitution and transposition. These are repeated one after another for 16 cycles.
+      -64-bit blocks
+      -56 bit number with 8bits as a check-digits.
+      -People have been interested in making DES more complex via a more complex key, but key is stuck at 56 bits.
+         -Double DES: Perform two encryptions one on top of another wih two different keys.  C = E(k2, E(k1, m)).
+            -This actually only increases the work load for brute force from 2^56 to 2^57 !!!
+               -Note that 2^56 comes from the number of possible keys at 56 bits long, each bit being 1 or 0.
+         -Triple DES: Use three encryptions with 3 different keys.  C = E(k3, D(k2, E(k1, m))).
+            -A different variation of this only uses 2 keys in this fashion:  C = E(k1, D(k2, E(k1,m))).
+      -Differential Cryptanalysis: Investigates the changes in algorithmic strength when an encryption algorithm is changed in some way.
+         -DES was show that any change in the algorithm weakens it.
+         -Still, no one has shown significant flaws in DNS.
+      -Due to the increase of computer strength, it was determined that a new alogrithm was needed. AES!
+      
+   -Advanced Encryption Standard: (Gradually replacing DES)
+      -1997 - call was made. 1999, algorithm was chosen, written by two Belgian Cyrptographers. The algorithm was named Rijndael.
+      -Primarily uses substitutions and permutations (transformations). 
+      -10,12, or 14 cycles (Like DES) for keys 128, 192, 256 bits. Cycles are called rounds.
+      -Block size 128 bits
+      
+   -Public Key Encryption:
+      -We want public keys so that we don't have to have a unique key between every two pair of people.
+      -Each user has two keys, a private and a public. 
+      -Public and private encryption are interchangeable:  P = D(Kpub, E(Kpriv, P)) and P = D(Kpriv, E(Kpub, P)) .
+      -Rivest-Sharmir-Adelman (RSA) cryptosystem: Relies upon number theory, which studies number and their prime factors. Keys are functions of 100-200 digit prime numbers.
+      -Is slow, about 10,000 times slower than symmetric encryption (this is due to division and multiplications versus add, subtract, XOR)
+    -Public/Private key Cryptography: (From Lecture)
+         -Invented by Diffie and Hellman 1976
+         -RSA, most popular public key algorithm, developed 1978 by Rivest-Shamir-Adelman
+         -General idea is for sender to encrypt message with receivers public key, therefore, only user can decrypt it with private key.
+            -The sender can also sign the message by adding encryption using their (the sender's) private key. This way, the receiver can first
+             decrypt using senders public key and then decrypt again using personal private key.
+         -How to find out each other's public keys?
+         
+   -Combined use of Symmetric and Asymmetric:
+      -Common to do so. 
+      -Asymmetric used to bootstrap symmetric crypto. Eg. Start with RSA to authenticate session key, then use AES.
+   
+   
+   -Cryptographic Hash Functions:
+      -Idea is to focus on integrity over secrecy
+      -We 'seal' a file, encasing it so changes become apparent. The function to apply this seal is a hash, checksum, or message digest.
+      -One-Way Functions: Functions which are much more easily to compute one way than the other... x^3 versus x^1/300
+      -Chaining could be done, meaning linking each block to the previous block's value. The checksum would be in the last block.
+         -CBC Cipher Block Chaining. First block?
+            -Use initialization vectors. (IV) Random string is used and Xor'd with plain text. This is sent along with cipher and receiver can use key to decrypt.
+      -MD4, MD5, SHA/SHS are most used hasing algorithms.
+      
+   -Key Exchanges:
+      -To establish an encrypted communication need to know keys. (public keys)
+      -A send to B: E(Kpub-b, K) . Problem is that b has no assurance that message came from a.
+         -Better way is this: E(Kpub-b, E(Kpriv-a, K)) . This way receiver decodes with private, and then public key of sender A.
+      -Diffie-Hellman key Exchange Protocol: 
+      
+   -Digital Signatures: Protocol that produces the same effect as a real signature: It is a mark that only the sender can make,
+                        but other people can easily recognize as belonging to the sender. Just like a real
+                        signature, a digital signature is used to confirm agreement to a message.
+      -Requires a third party. Signer encrypts document with secure key which is shared with 3rd party, then the receiver can check the validity with the third party.
+      -As previously stated, can sign with senders private key, thereby eliminating third pary.
+         -How does the receiver know the he has the right public key of sender?
+   
+   -Certificate: Public key and users identity are bound together in a certificate and signed by someone called a certificate authority.
+      -Contents:
+         -Name of ohlder, public key of holder, name of trusted third party, DIGITAL SIGNATURE OF CERTIFICATE AUTHORITY, data on which hash and public key algorithms have been used, and other business or personal information.
+         -Certification chains allow for a chain of trust. Tree model, perhaps, so you can traverse up and down the tree.
+   
+   -Trust: Can come through a heirarcical structure(tree structure)
+   
+   -Leap of faith: Just as stated.. attempt to connect based upon perhaps blind trust..
+   
+   
+   -Lecture 2:
+      -Codes: "The hawk flies at midnight" == ...
+         -Attackers may observe frequency of phrases. 
+         -Weakness based on need for a codebook.
+      -WW2, Axis used superencipherment, which was encrypted coded messages.
+      
+   -Lecture 3:
+      -Uses of cryptography:
+         -Secrecy, autentification, prevention of alteration.
+   
+   
+   
+   
+Chapter 7: Networks
+
+   7.1 - Network Concepts:
+   -Single Point of Failure: Concept where a failure at a single point can cause the failure of an entire system.
+   -Resilience/Fault Tolerance: Battles single point of failure by having redundancy, thus enabling work arounds for failures, overloaded segments
+   -Networks:
+      -Node: A single system in a network.
+      -Host: Processor computer in a network.
+      -Link: Connection between 2 hosts.
+      -Workstation: End-user computing device, usually designed for a single user at a time.
+   -Shape and Size:
+      -Network Topology: Way which a network is configured in terms of nodes and connectsion.
+      -3 Dimensions of Networks which have a bearing on network security:
+         -Boundry: Distinguishes an element of the network from an element outside it.
+         -Ownership: 
+         -Control: Only as good as ownership. Does administrator establish access control policies, etc?
+   -A mode of Communication:
+      -Communication:
+         -Digital: Data items are expressed as discrete binary values.
+         -Analog: Data items are expressed as points ina continuous range, using a medium like sound or electrical voltage.
+         -Modem: Converts data between digital and analog. (Ex: May be necessary b/c telephone expects to transmit analog.)
+      -Media: Ex: Wires, through air, etc.
+         -Cable:
+            -Twisted Pair or Unshielded Twisted Pair (UTP): A pair of insulated copper wires. (< 10mb for 300 ft)
+            -Coaxial Cable: Most common cable type known as Ethernet. (< 100 Mbps for 1500 ft) To allow further travel, use repeaters or amplifiers.
+         -Optical Fiber: Made of thin strands of glass which transport pulses of light. (< 100 Mbps for 2.5 miles)
+         -Wireless: 802.11
+         -Microwave: Good way of outdoor communication. Advantage in that signal is strong at send and receive. Disadvantage is that the wave travels at line of sight. Limited by earth's curvature.
+         -Infrared: Same idea as microwave transmissions but only having a distance of up to 9 miles.
+         -Satellite: Role is to just intercept signals and bounce them back to the earth. Normally send back data in a larger area surrounding destination. This area is known as a footprint. (Might be several hundreds of miles wide)
+   -Benefits of a network:
+      -Information sharing
+      -Hardware sharing
+      -Software sharing
+      -collaborative enviroment
+   -Protocols: (Agreed upon set of rules and procedures for transmitting data between two or more devices.)
+      -Protocol Stack: A layered architecture for communications.
+      -Networks normally use either (OSI) Open Systems Interconnection, or (TCP) Transmission Control Protocol and (IP) Internet Protocol.
+      -OSI: Layers: Application, Presentation, Session, Transport, Network, Data Link, Physical
+         -Addressing:
+            -Router: Hardware device which actually sends the message from your network to a router on the destination network.
+            -Gateway: Used to be what we now define as router, but now does protocol conversions of application layer received from different protocols.
+            -Packet: Combination of the following data items: Destination address, source address, and data. This is known as the network layer.
+            -Network Interface Card (NIC), MAC Address : A "Frame" is composed of source MAC and destination MAC. MAC addresses are given by the NIC. Whole purpose is to make it from your computer to your router.
+      -TCP/IP: Layers: Application, Transport, Internet, Physical
+         -UDP (User Datagram Protocol) is part of this family.
+         -Transport layer converts messages to packets, and internet layer converts packets into datagrams.
+         -Port: Number designating a particular application running on a computer.
+      -IP Address: Address identification.
+      -Domain Name: Alias for a particular IP address. Domain names are converted into IP addresses.
+      -Top Level Domain: Right most portion of a domain name.. for example, .COM, .EDU, .NET, etc.
+   -Local Area Network (LAN): Small, local, physically protected, and limited scope.
+   -Wide Area Network (WAN): Single Control (organization), Covers a significant distance, Physically Exposed.
+   -Internets or Internetworks: A network of networks, where each network is separately managed and controlled. Most well known internetwork is the Internet.
+
+   -Lecture 4 Notes:
+      -Network architecture:
+         -P2P: Computers connect to each other in a workgroup of shared files, printers, etc.
+         -Client-Server architecture: sends information from client to server which then relays the information back to client computer.
+      
+      -Bandwidth: Data rate measured in bits per second.
+      -TCP/IP Network Model: Layers 1-4: Link, Network, Transport, Application
+      -VPN (Virtual Private Network): Secure tunnel to a private network through a public network.
+
+      -Host: computer connect directly to the internet.
+      
+      -Allocation of IP address:
+         -Controlled centrally by ICANN
+         
+   TCP Segment:
+      Source Port: 16
+      Dest. Port : 16
+      Seq. Number: 32
+      ACK Number : 32
+      Data Offset: 4
+      Reserved(000): 3
+      Flags: 9 @ 1 bit each
+      Widnows Size: 16
+      Checksum: 16
+      Urgent Ptr: 16
+      Data....
+      
+   UDP Segment:
+      Source Port: 16
+      Dest. Port: 16
+      Length: 16
+      Checksum: 16
+      Data
+      
+   IP Segment:
+      Version: 4
+      Length of IP header: 4
+      Type of Service; 8
+      Total Length: 16
+      Identification: 16
+      Flags: 3
+      Fragment Offset: 13
+      TTL: 8
+      Protocol: 8
+      Header checksum: 16
+      Source IP Addr: 32
+      Dest. IP Addr: 32
+      Options..: 24
+      Padding: 8
+      Data...
+      
+   
+   7.2 - Threats in Networks
+      -What makes a network vulnerable?
+         -Anonymity - Attacker can attack from a great distance away from the network.
+         -Many ports of attack - Even if a single system is secure, that doesn't mean another system which passes the same file is.
+         -Sharing - The nature of the network itself allows access to files in multiple systems
+         -Complexity of system - If a network combines systems of different type, which by themselves are complex.
+         -Unknown perimeter - problem occurs when new hosts are added to the network.. can they be trusted?
+         -Unknown paths - The path of travel of information may pass through several other hosts which may/may not be trusted.
+      -Why attackers attack?
+         -Challenge
+         -Fame
+         -Money and Espionage
+         -Organized Crime
+         -Ideology:
+            -Hactivism: operations that use hacking techniques against a targets network with the intent of disrupting normal operations but not causing serious damage.
+            -Cyberterrorism: Motivated hakcing operations intended to cause grave harm such as loss of life or severe economic damage.
+      -How attacker prepare attack:
+         -Reconnaissance: Attacker will find out as much as possible about its target.
+         -Port Scan: A program that, for a particular ip address, reports which ports respond to messages and which of several known vulnerabilities exist.
+            -Tell the attacker 3 things:
+               -Which ports or services are running and respond
+               -What operating system is installed on the target system.
+               -What applications and versions of applications are present.
+         -Social Engineering: Using social skills and personal interaction to get someone to reveal security-relevant information.
+         -Intelligence: General term for collection of information.
+            -Dumpster Diving: Looking through items that have been discarded in rubbish bins or recycling boxes.
+         -OS and Application Fingerprinting:
+            -Tests done to mark the manufacture and version of OS and application on a system. 
+         -Bulletin Boards and Charts
+            -Attackers can share their knowledge and gather information from their victims via what they post on internet.
+         -Availability of Documentation: Vendors of software release documentation which attackers can study and use.
+      -Types of Attacks:
+         -Eavesdrop: Overhearing without expending any extra effort.
+         -Wiretap: Intercepting communications through some effort.
+         -Passive wiretapping: just "listening", much like eavesdropping.
+         -Active wiretapping: Injecting something into communications.
+         -Calbe:
+            -Packet Sniffer: Can retrieve all packets on the LAN.
+            -Inductance: Because ordinary wire emits radiation, you can tap a wire and read radiated signals without making physical contact.
+            -Data transferred in WAN might be heavily "Multiplexed", that is, more than one signal is transmitted at a given time, thus, a hacker will also have to distinguish between the signals.
+         -Microwave: Very easy to intercept.
+         -Satellite: Same potential interception as microwave but worse, however, is normally heavy multiplexed thus giving it some protection.
+         -Optical Fiber: Have two major advantages of security:
+            -1. Entire optical network must be tuned carefully for every new connection, thus, no one can tap in without detection.
+            -2. Because it transports light, not electricity, it cannot emanate a magnetic field, thus, an inductive tap is impossible.
+         -Wireless: Interception b/c wireless signal is strong for approximately 100 to 200 feet. 
+      
+      -Protocol Flaws: 
+         -Each accepted protocol is known by its Request for Comment number (RFC). 
+            -TCP: Attacker could guess or find out next sequence number and thereby impersonate the client in an interchange.
+      
+      -Impersonation: 
+         -Go directly to the source of data. Guess authentication, disable authentication checks, or use account where authentications isn't required.
+         -Passwords can many times be guessed.. this is due to users not having strong passwords, or default ones. 
+         -Authentication may also be thrwarted by eavesdropping while it is being sent over a network. 
+         -Avoidance
+            -Some old OS's have a fixed buffer size for authentication. If the password exceeds buffer, this is a glitch and access is given. Atacker might scan system ofr a weak OS.
+         -Non-Existant Authentication: Some systems keep a list of trusted devices which can connect without authentication. If an attacker gets into one of these trusted devices, it can thereby enter the real target without the need for authentification.
+         
+         -Spoofing: When an attacker falsely carries on one end of a network interchange. (Session hi-jacking, man-in-the-middle)
+         -Masquerade: When one host pretends to be another.  For example: bankofamerica.com versus bank-of-america.com ... where the later could be a scammer
+            -Phishing: Version of masquerade where action is taken to get the user to enter private information.         
+         -Session Hijacking: Intercepting and carrying on an interaction which began by a different entity.
+         -Man-In-The-Middle Attack: Same as session hijacking except that the attacker participates from the beginning of interchange.
+      
+      -Confidentiality Threats
+         -Misdelivery: Most of the time due to human error...
+         -Exposure: Messages can be exposed at any step along the transfer... including buffers in which it is held in routers and what not.
+         -Traffic Flow: The fact that a message has been sent might be confidential... Think of time of war. If many messages are being sent it might mean that something big is about to happen.
+      -Integrity Threats
+         -Falsification of information: Attacker may change information contained in message including content, source, etc.
+         -Noise: Unintended sources of interference, such as lighting, electric motors, animals, etc.
+      -Format Failures: We have protocols in order to keep data integrity and the exchanging systems obey the rules of the protocol... but an attacker may not. He might try to break it by sending something that might error out the system.
+      -Web Site Vulnerabilities: 
+         -Web Site Defacement: Web sites are designed so that their code can be downloaded and seen (HTML). Even the programmers comments might be available for the taking.
+         -Buffer Overflows: Same idea as local programs. Input too much information into a buffer, it overflows into adjoining code and data locations.
+         -Dot-Dot-Slash: Command which navigates to the parent directory.  Attacker may use it to navigate up server file tree and delete or steal information.
+         -Application Code Errors: Where users can modify the context of strings being passed from server to client. For example, say you are on amazon.com and add cd to cart. http://amaozon.com/....?id=1234&pr=299  . Let's say that 2.99 is the price. If we can modify this to 199, perhaps we can lower the price of the same item down to 1.99!
+         -Server Side Include:
+      -Denial of Service:  Availability Attacks
+         -Transmission Failure: Cut lines, network noise, overloaded server.
+         -Connection Flooding: Attacker sends server as much information as possible, thus flooding your server and preventing you from receiving other data.
+            -Besides the use of TCP and UDP, there is ICMP, (Internet control Message Protocols). This is used for network management, but can also be used to attack a system.
+            -Echo-Chargen: Chargen is a protocol that generates a stream of packets. The attacker sets it up so that an infinite loop of packets starts between machines A and B.
+            -Ping of Death: If receiver responds to ping request, attacker can flood it with ping requests. Note that to do this the attacker must have a higher bandwidth than the receiver.
+            -Smurf: Variation of ping of death, but attacker will ping a network (ping entire network by setting last byte of address to all 1's - broadcast mode), and setting the source of the ping as the attacker's victim.
+            -Syn Flood: Referring to TCP protocol, in the three way hand-shack the client sends a SYN, the server responds with a SYN and ACK and waits for client to ACK. However, an attacker might continue to send SYN's. This would eventually fill up the server's SYN_RECV, which is a queue of SYN's received.
+               -Normally attacker will set each SYN source address to be different, thus avoiding detection of the true source and making the requests look more legit.
+            -Teardrop: Because transfer of packets can be fragmented, an attacker might send overlapping data in packets. When the server tries to assemble it and cannot, it may cause errors or in worse case crash the system.
+            -Traffic Redirection: Basic idea is to flood a single router by having the other routers send their information its way. 
+            -DNS Attacks: Attackers manipulate DNS or cause it to cache spurious entries "DNS Cache Poisoning", the attacker can redirect the routing of any traffic.
+      -Distributed Denial of Service: Attacker plants a Trojan horse in zombies, not a dead process zombie. Then a trigger is given and all zombie systems run attacker script.... doing one of the above flooding attacks on a victim system.
+      -Threats in Active or Mobile Code:
+         -Active or mobile code is that which is pushed to the client for execution. (Avoids having the server use processing power)
+            -This, of course, provides a wide open door for malicious intents.
+         -Cookies:
+            -Not active code, but data files stored and fetched. 
+            -Persistent: Stored for future access
+            -Per-Session: Only held in volatile memory.
+            -Though encrypted with the source server key, they can be grabbed by anyone, even attackers.
+         -Scripts:
+         -Active Code: Java Code and ActiveX Controls
+            -Hostile Applet: Downloadable java code that can cause harm on the client's system.
+            -ActiveX is based upon known file types by which applications are on the system. Verify source, but cannot verify how good or safe it is.
+         -Bot Nets:
+            -Bots: Malicious code under remote control. Are trojan horses.
+      -Complex Attacks:
+         -Script Kiddies: Those who use the scripts written by another to mount an attack... The fact is that these attacks are scripted out and available.
+
+   -Lecture 5 Notes:
+      -Packet Sniffers: can listen to all traffic on a broadcast medium
+      -Traffic Analysis: Process of intercepting and examining messages in order to deduce information from patterns in communication.
+      -Denial of service can also happen by corrupting routing tables.
+      -Defence against denial of service:
+         -Can't just stop the flood, but need to also ensure service to legitimate clients.
+      -Source address filtering: 
+         -If a strange source IP address is seen leavign the LAN into the internet, perhaps a device can drop it. Also, incomming stuff may be dropped for same reason.
+      -Padding: Sometimes we don't want intruders to know traffic characteristics, so pad it with extra 'fake' traffic. Must look real, so encrypt it.
+      
+   -Lecture 6 Notes:
+      -Port Scanning: 
+         -Attacker does a SYN scan:
+            -If the port is closed, server computer responds with RST/ACK
+            -If attacker receives back SYN/ACK, it quickly closes connection with RST/ACK as to not be logged (once 3 way handshack is complete)
+         -Types:
+            -NULL scan: All packet flags are turned off. B/c closed port returns RST/ACK, if no response sent, means port is open.
+            -XMAS scan: FIN flags are set. Closed ports respond with an RST packet.
+            -Ack Scan: Because firewalls normally only look for SYN, use ack instead. If server responds with RST, then filter has been fooled.
+            -FIN Scan: If closed, sends back RST
+            -UDP Scan: If port sends back "Port Unreachable" message, then port is colsed.
+         -Can also be used to do a Ping Sweep
+            -Identify which IP addresses belong to active hosts.
+      -Resadue of Port Scans:
+         -Several packets to dest. ports from same source in short period of time.
+         -Simple port scanning can be logged by services listening at ports... something comes in with no data.. log it.
+      -Attackers Response to resadue:
+         -Scan slowly
+         -Flood with spoofed scans with fack source IPs, and only have one be from real source.
+      
+   -7.4: Firewalls
+      -A device which filters out traffic between a protected or "inside" network and less trustworthy are outside. 
+      -Types of firewalls:
+         -Packet Filtering Gateway: (AKA Screening Routers)
+            -Blocks certain packets based on ip address, port number, and protocol.
+            -Only block upon the basis of IP address and port. 
+            -Too simplistic router inspection. To do more sophisticated filtering, many details need to be given and complexity arises.
+            -Pros:
+               -Fast, Cheap, Flexible, Transparent
+            -Cons:
+               -Limited Capabilities, poor login, dependent on header authentication.
+         -Stateful Inspection Firewall: 
+            -Maintains state information form one packet to another in the input stream. This avoids attacks such as teardrop.
+         -Application proxy: (AKA proxy gateways) (Bastion Host) Essentially, the firewall simulates the effects of an application so that the application receives only those requests to act properly.
+         -Guard:
+         -Pros:
+            -Highly flexible, good logging, content-based filtering, potentially transparent.
+         -Cons:
+            -Slower, more complex and expensive, highly dependent on proxy quality.
+      
+      -Personal Firewalls: Application program that runs on a workstation to block unwanted traffic, usually from the network.
+      -More:
+         -Firewalls only protect what is inside its perimeter. If there is a connection inside the perimeter to the outside that doesn't pass through the firewall, that is a potential threat.
+         -Are most visible part of an installation to the outside, and thereby the most attractive target to attackers. Best to have several layers "Defense in depth."
+         -Must be kept up to date as internal/external factors change, and must be configured correctly as such.
+       
+      -Lecture 5 Notes:
+         -Firewall machine is often called a "bastion host"
+         -Firewalls are only good until attacker gets past perimeter. Eg. Windows password.. once past, attack can do anything.
+         -Desnse in depth: Don't rely upon single layer of defense, rather, have many.
+         -Reverse Firewalls: Keep stuff from the inside from getting outside.
+            -Used to conceal details of network from attackers
+            -Prevent compromised machines from sending things out.
+         
+        
+       
+   -7.5: Intrusion Detection Systems (ISD)
+      -Many attacks come from inside the firewall... sometimes malicious, other times simple user mistakes.
+      -A device, normally another separate computer, which monitors activity to identify malicious or suspicious events.
+      -Basic functions:
+         -Monitor users and system activity
+         -Auditing system configuration for vulnerabilities and misconfiguration.
+         -Assess integrity of critical system and data files
+         -Recognizing attacks
+         -etc.
+      -Types of IDSs
+         -Misuse Intrusion Detection: (Signature Detection) Works from a model of known bad activity.. eg. someone trying to access the password file.
+            -Signature-based: simple pattern matching and report situations that match a pattern corresponding to a known attack.
+            -Attacker may try to modify a basic attack in such a way that it may not match a known pattern.
+            -To counter this, signature based may use statistical analysis which gathers sample measurements of key indicators (like number of external activity, number of active processes, etc) to make a decision.
+            -Pros:
+               -Few false positives, simple technology, hard to fool
+            -Cons:
+               -Only detects known problems, gradually becomes less useful if not updated, sometimes signatures are hard to generate.
+               
+         -Heuristic: (anomaly based) Builds a model of acceptable behaviour and flag exceptions to that model. Administrator can then mark that flag as acceptable or not.
+            -Inference Engine: Performs continuous analysis of the system, raising an alert when the system's dirtyness (accumulation of strange activities) reaches a certain level.
+               -State Based: Overall state of system. Inference engine signals when system has veered into unsafe grounds.
+               -Model Based: Looks at current activity and raises alarm when it reaches a specific model of activity.
+            -Pros:
+               -Can detect previously unknown attacks
+               -Not deceived by trivial changes in attack
+            -Cons:
+               -Hard to diagnose attacks
+               -Prone to many false positives
+               -Might be expensive and complex.
+            -Most academic studies are in this area. It has greater promise in the future.
+            
+         -Specification Detection: Very close variant of Anomaly Detection. Where anomaly detection says deviations from statiscally normal behavior are bad,
+          specification defines exactly what is good and calls the rest bad.
+            -Protocol Anomaly Detection: Derivation of Specification Detection. Relies upon precise definitions of network protocols.
+            -Pros: 
+               -Allows formalization of what your looking for
+               -Limits where you need to look
+               -Can detect unknown attacks
+            -cons:
+               -Only effective when one can specify correct state
+               -Based on locating right states to examine
+               -Attackers might be able to do what they want without changing from 'good' state.
+               
+       -Architecture of IDS's:
+         -Network Based: IDS is a standalone device which is attached to the network and monitors traffic.
+            -Need not use resources on users' machines
+            -Easier to properly configure for large installations
+            -Can observe things affecting multiple machines.
+            -Data Volume
+               -Vast amounts of data go through network.. much time and space needed to store and go through it all.
+               -Sensors are used to record relevant stuff and discard the rest.
+         -Host-Based: IDS runs on a single workstation or client or host.
+            -Lots of info to work with and only has to deal with one machine.
+          -Application-Based IDS:
+             -tuned to one application or protocol. Normally for specialized machines like web servers, databases, etc.
+         -Stealth Mode: IDS will many times be connected to two networks. The first is the one which its monitoring, only taking input from that network. The second is used to send out alarms in the case of alarm.
+      -Problems:
+         -False-Positives: When IDS marks a non-suspicious activity or event incorrectly. 
+         -False-Negatives: An intrusion not noticed.
+         -Subversion Errors: Attacks on the intrusion detection system.
+         
+      -From Lecture 7 Notes:
+         -Desired Characteristics:
+            -Continuously running
+            -Fault Tolerant
+            -Subversion Resistant
+            -Minimal Overhead
+            -Must observe deviations
+            -Easily tailor-able
+            -Evolving
+            -Difficult to fool
+         -How is intrusion detected?
+            -Examine logs, monitor system activities, scan state of system, and sniffing the network.
+         -How does an IDS evolve?
+            -Manually or semi-automatically vs. Automatically
+               -Very time consuming to manually go through and make updates.
+         -Generally there is a trade-off between false positives and negatives.
+         -What does an IDS do when it detects an attacker?
+            -Shut down the attacker, or more carefully protect the attacked service
+               -Perhaps not the best for too many false positives...network will stop working.
+            -Alarms to administrator
+               -If too many false positives, administrator might start to ignore them.
+            -Just log it.
+               -No action guaranteed...
+               
+               
+Lecture 8 Notes: Intro to Network Forensics
+   -Preservation, identification, extraction, documentation, and interpretation of computer media for evidence and/or root cause analysis.
+      -Due to computer crimes: computer is a tool in a crime or computer is victim of a crime.
+   -Network:
+      -Capture/recording and analysis of network events in order to discover source of security attacks.
+         -Captured data: PCAP (full packet capture), netflow (flow data), Log/alert data.
+            -PCAP - Full copy of a set of packets travelling over network. Takes up a lot of space.
+            -Flow Data - records of conversations on networks. Time, duration, number of packets, etc. 
+            -firewall alerts, availability alerts, etc. We want good alerts b/c overflow defeats the purpose.
+         -Get this information using tcpdump or wireshark.
+         
+Lecture 8.2 Notes: Intro to network address translation (NAT)
+   -NAT changes the IP address in the IP header.
+   -PAT is an extension of NAT, which associates a source port with each flow
+      -Extends NAT one-to-one to a many-to-one (Many sources to single output destination)
+   -We have NATS b/c limited public IP addresses.
+      -We use private IP addresses internally on a network
+         -Problem: Hosts can't access registered networks such as the internet when assigned an private IP
+            -Solution: NAT will replace sourc private IP address with its public one.
+      -NAT eliminates the need for host renumbering when changing the ISP or IP addressing schemes.
+      -NAT hides the structure of the internal network. Defeats port scannign of the sub-net
+      -NAT has static and dynamic translations
+         -Static: Want host to always be translated to specific IP address. (Used to set up a server on the network)
+         -Dynamic: When you want to initiate a connection from only the inside or only the outside.
+      -Acts as a security feature b/c outsiders cannot see the inside architecture of the network.
+   -General Architecture:
+      -Translation table with columns (source private ip, source port, destination ip, destination port, new port number)
+         -The new port number exists b/c multiple requests in a PAT may have the same source port. The translation table can assign each of these a new unique port. When the request comes back, we know which private client to give it back to. Simply write the correct port before giving it back.
+   -Essentially acts as a firewall too b/c keeps track of outgoing traffic, and has an idea of what we are expecting from the ouside world.
+               
+Lecture 11 Notes: User authentication
+   -Process of verifying a claim that a system entity or system resource has a certain attribute value.
+      -Normally in two steps: Identification: User ID (generally unique but not secret), and verification: password, pin, biometric, etc.
+   -Computer Hijacking: Attackers gain access to computer that user is currently logged into.. countermeasure : auto-logout.
+   -Exploiting multiple password use: user uses same password for multiple systems... gives attacker multiple access once password is found.            
+   -Electronic Monitoring: Attackers intercept passwords sent across a network.
+      -Countermeasure by encrypting communications.   
+   -Storing Passwords:
+      -Encrypted: You would have to store the key somewhere else... so, doesn't help much
+      -Hashing: Should be one-way function, minimal collisions, and variable sized input which produces fixed length.  
+         -Pre-found hashes can be found... reduced space by storing in rainbow table.
+            -Countered with salts.. can still brute force it and have rainbow table, but it would have to be specific to the salt.
+ 
+Lecture 12: Access Control
+   -Prevention of unauthorized use of a resource, include the prevention of use of a resource in an unauthorized manner.
+   -Authentication: Verification that the credentials of a user or other entity are valid
+   -Authorization: Granting of a right or permission to a system entity to access a resource
+   -Audit: Independent review of system records and activities in order to test for adequacy of system control.
+   -Discretionary Access Control (DAC): Use identity of requester and access rules to control access. Entities may allow other entities to access resources.
+      -Common scheme in OS and DB
+      -Access Matrix specifies access rights of subjects and objects.
+         -Matrices are sparse, so either do:
+            -Access Control List (ACL): For each object, list user access rights.
+            -Capability Lists: For each subject, list objects and the rights the subject have on that object.
+   -Mandatory Access Control (MAC): Compare security labels with security clearances to determine access. Entities CANNOT grant access to resources to other entities.
+      -Based on multilevel security (MLS) --> topSecret > secret > confidential > restricted > unclassified
+         -No read up, and no write down.
+   -Role-based Access Control (RBAC): Roles of users in system and rules for roles are used to control access.
+      -Users are assigned roles, and the access rights are assigned to roles... (Groups essentially).
+         -Hierarchy design is one possibility: A higher role includes all access rights to lower role
+         -Mutually exclusive roles: users can only be assigned to one role in the set.
+            -Roles may have cardinality (max number of users, roles assigned to user, etc.) and/or prerequisite (condition upon which a user can be assigned a role.)
+      -One way to set up datastructures is to have 2 matrices. 1 would be user rows and roles coloumns, and the other would be Role rows and File columns. Because num_users << num_roles, the matrix is overall much much smaller than using the single matrix where user vs. file
+            
+            
+Lecture Code Security:
+   -Best to design for security at the beginning... not later.  :: windows 95 example.
+   -Remember its not the only goal... not the primary goal either.
+   -Someone who understands security should be involved from the start of a project, and should continue through every phase of the implementation.
+   -Rules:
+      -Secure the Weakest Link
+      -Practice Defense in Depth
+      -Fail Securely
+      -Use principle of least privilege
+      -Compartmentalize
+         -Divide program into pieces... compromise of one piece does not compromise others.
+      -Simplicity is best
+      -Promote Privacy
+         -Don't ask for data you don't need, avoid storing user data permanently, etc.
+      -Don't hide secrets in the source code... they will find it.
+      -Be reluctant to trust
+      -Use community resources
+         -Don't impliment your own AES code
+         -Don't assume that open/closed sources are secure, or more secure than the other.
+   -Languages:
+      -C/C++  -- no checks for buffer overflows... probably worst security choice.
+      -Java -- Handles c++ flaws, but has its own set of flaws.
+      
+   -Open Source versus Closed Source
+      -Some argue that opensource is more secure b/c more eyes look at it
+         -This also means that hackers get full access to source code and loop for vulnerabilities. 
+      -Closed sources still have their fair share of updates and patches.
+      -No solid evidence that open or closed source produce better security.
+   
+   -Companies sometimes put trapdoors into software
+   
+   -Error Handling
+      -Code which does so is generally not very well tested. ...so it might have undetected errors.
+      -Problems:
+         -Not cleaning everything up
+         -Variables not reset
+         -Security mistakes, such as not releasing security privileges when you should
+         
+   -Random Number generation
+      -PRNG (Pseudorandom Number Generator): mathematical method designed to produce strings of random-like numbers (deterministic)
+         -Attacks:
+            -Observe Stream and attempt to deduce the function
+         -Improvements?
+            -Use hardware randomness
+      -TRNG (True Random Number Generator): Non-deterministic based upon physical environment
+      
+   -Input verification... b/c all input should be treated as hostile
+
+   -Variable Synchronization: When two, or more, variables depend on each other for accuracy. (Example: buffer length and buffer size)
+   -Variable initialization in languages like c/c++. If you don't assign it anything, may contain values used in the previous function's variables.
+      -If attacker can modify the values of the first program, maybe can influence the behaviour of the second.
+   -Variable clean-up.
+
+   
+Chapter 4: Protection in General-Purpose OS
+   -4.3: Control of access to general objects
+      -Goals in protecting objects:
+         -Check every access
+            -Just because a user could access an object once, doesn't mean he should have access to it again. Checks should be made every time access is requested for an object.
+         -Enforce Least Privilege
+            -User should have access to the smallest number of resources necessary, or should have the most minimal power needed to access those resources.
+         -Verify acceptable usage
+            -Ensure that the usage of an object is acceptable.
+      -Directory
+         -Each user has a directory which lists all the files to which that user has access to.
+         -Rights to files include Read, Write, Execute.
+         -Also notion of 'owner' which can grant or take away access writes.
+            -Difficulties:
+               -List of individual user directories (what each user has access to), quickly becomes large. Deletion must be reflected in all directories.
+               -Revocation of access: It's easy to remove the access rights of one user, but to several users it becomes difficult and time consuming. You would have to step through all the users with file access writes to that file and delete the entry.
+               -Pseudonyms: Say users A and B have two different files both named "F". How do we distinguish them for access right purposes if we want to share file "F" with another user? 
+      -Access Control List
+         -Each file has a single table (linked list) of who has access and what access they are to have. (Very closely related to Directory approach.) 
+      -Access Control Matrix:
+         -Just an access control list made into matrix form. Users are row headers and files are column headers. Access rights are placed in the remaining cells.
+         
+      -"Capability": an unforgeable token which gives permission to a subject to have certain type of access to an object. 
+      -"Kerberos": implements both authentication and access authorization by means of capabilities, called tickets.
+         -Requires two systems
+            -Authentication Server (AS): User presents a credential, such as a password, to the AS and receives a ticket that shows uer has passed authentication.
+            -Ticket-Granting Server (TGS): Ticket is presented to this server which returns two tickets: one to notify access authorization and the second is for the user to present in order to get the resource.
+         -Kerberos implements a single sign-on, that is, that is, a user signs on once and from that point on all the user's (allowable) actions are authorized without the user needing to sign on again
+      
+      -Procedure Oriented Access Control: existence of a procedure that controls access to objects, in essence, forming a capsule around the object, permitting only certain access.
+      -Role-Based Access Control: associates privileges with groups, such as "administrator".
+      
+   -4.4: File Protection Mechanisms: 
+      -All-None Protection: Either something is public, non-protected, or it isn't. Referring to early systems where most files are public and only a few are password protected. Protection was based on file name ignorace and mutual respect.
+         -Problems:
+            -Lack of trust
+            -Too coarse: no convenient way to only allow access to trusted users
+            -Rise of Sharing: Works better on batch environment, that is, only use system when work needs to be done.
+            -Complexity: Human operator intervention is required for this protection, so OS performance is degraded.
+            -File listings: Users are not ignorant to what files exist because there are ways of displaying all files.
+      -Group Protection: Same idea as seen in Linux: user, group, world; or in windows: Administrator, Power Users, Users, Guests.
+         -Each user's userID and groupID are stored in the OS. It then just comes down to comparing this to the file access information.
+         -Restrictions/Difficulties:
+            -Group Affiliation: Single user cannot be in two groups.
+            -Multiple-Personalities: When a single person creates more than one account to overcome the one-person one-group limitation.
+               -Redundant files, inconvenience to users, etc.
+            -All groups: Another problem created by multi-personalities. Essentially it becomes harder to realize what you are sharing with who....Say Bill can log in as either part of group1 or group2. Say in group1 he shares file A with Bob, and in group2 he shares file B with Sue. While looged into group2, he will see Both files A,B, but may be unaware that file B is not being shared with Bob.
+            -Limited Sharing: Can only be shared within a group, or within the world. This restricts custom groups.
+      -Persistent Permission: Typical example is a combination between name (user) and some sort of token. (card, password, etc.) Can be required for any access or only for modifications.
+      -Temporary Acquired Permission: In Unix, the use of set userid (suid) which in file execution the permissions of the user that called the execution are temporarily changed to the permissions of the file creator. So, if Mary, a basic user, wants to write to a file but doesn't have permission, she can use the exec that Joe, someone with permission, made, and Mary will then have permission, but acutal write is done by Joe's program.
+      
+      -"Primary limitation of these protection schemes is the ability to create meaningful groups of related users"
+     
+   -4.5: User Authentication
+      -Based on three things:
+         -Something the user knows
+            -Passwords, PIN, security questions
+         -Something the user has
+            -Badges, drivers liscense, uniforms
+         -Something the user is (biometrics)
+            -Voice, fingerprints, face
+         -Best to combine two or more factors together to make a more solid authentication.
+      
+      -Passwords: "word" known by user and comptuer.
+         -Widely used by suffer from difficulties of use:
+            -Loss: If a password is lost it can be hard to recover. Often times a new one must be assigned.
+            -Use: Supplying a password for each access to a file can be inconvenient and time consumming.
+            -Disclosure: Once it is disclosed, the protected file becomes immediately accessible. If the legitamate user then changes the password to re-protect the file, must notify all others who use the same password to access the file.
+            -Revocation: To revoke a users right to a file you have to reset the password.. thus same problem as disclosure.
+      
+      -Authentication can be based upon use conditions. For example, from a specific port, and at a specific time parameter. 
+         -This, of course, has its inconvenience if someone works overtime, or if he/she wants to work from home or a different workstation
+            -Security trade-off. (Security versus convenience.)
+      -Multi-factor authentication: using more than one form of authentication
+         -Same trade-off of security versus inconvenience.
+      
+      -Attacks on Passwords:
+         -Brute force, frequently used, user-related, search system list of passwords, ask the user
+         -Loose-Lipped Systems
+            -Say a system that asks for user name first, then password. Attacker can easily get a list of possible users if the system responds upon an incorrect user name before requiring the password.
+         -Exhaustive Attack
+            -Attacker tries all possible passwords, usually in some automated system. 
+         -Probable Passwords:
+            -Defined by human characteristic.
+         -Password likely for a user:
+            -family names, celebrity names, pets, etc.
+      -Plaintext System Password List
+         -To validate passwords the system will need some type of file/database that stores them. Attacker may choose to attack this instead.
+            -Systems sometimes backup their files in case of disaster recovery. These backups could then be used as a way to access the backed up password file, which is, in this case, not being protected.
+         -This can be battled by encrypting the password file.
+            -Still will exist in plain text format when in main memory.
+            -There is also the possibility that the same password could exist for multiple users
+               -This can be battled with salt. In this case, (the book), the salt is a 12bit value formed from the system time and process identifier. This is added to the plain-text, then encrypted. The salt will have to be stored.
+      -Indiscreet Users
+         -Humans may store their passwords in the desk drawer, or may give another their password rather then take the time to share a file.
+      -One-Time Passwords: Also called challenge response systems. The system assigns a static mathematical function. The system then provides an argument for the equation, and the user returns the answer.
+
+      -Authentication Process:
+         -Legitimate users will not mind if the login process takes 10-15 seconds... but this would foil a brute-force attack.
+            -In some systems it is much more important to stop penetrators than to tolerate human mistakes.
+      
+      -Impersonation of Login
+         -How can a client trust the server it's trying to connect to? It's possible that a programmer could set up a page that looks like the legit login page, get user's password, then disconnect the user with an error. 
+            -To get around this, the server can send a time stamp, or some token, that the user would recognize. 
+      
+      -Biometrics
+         -Identification versus Authentication
+            -Authentication is a superset of identification.
+               -Authenticate: I am <your name>, here is my hand (scanner scans it) ...versus
+               -Identification: (Scanner scans hand) "this is <your name>
+                  -Authentication is feasible... not so mush identification.
+         -Problems with Biometrics
+            -People find them intrusive... don't want to have their face scanned, or place finger in a slot
+            -Costly devices
+            -...authentication if "close enough"
+            -Single point of failure.. not the users fault if biometric scan fails
+            -Technology is new.. there are false positives and false negatives.
+            -Speed of the recognition reduces accuracy.
+            -Forgeries are possible.. like artificial fingerprints.
+         
+      -Phishing: when unsuspecting user submits sensitive information to a malicious system impersonating a trustworthy one.
+            
+
+
+
+**************************************ARTICALS***********************************************
+Port-Scanner : Wikipedia
+   -Software application designed to probe a server or host for open ports.
+      -Can be used to guess what OS is running.
+   -Types:
+      -TCP Scanning: If a port is open, the operating system completes the TCP three-way handshake, and the port scanner immediately closes the connection to avoid performing a Denial-of-service attack. Otherwise an error code is returned.
+      -SYN Scanning: SYN scan is another form of TCP scanning. Rather than use the operating system's network functions, the port scanner generates raw IP packets itself, and monitors for responses. This scan type is also known as "half-open scanning", because it never actually opens a full TCP connection. The port scanner generates a SYN packet. If the target port is open, it will respond with a SYN-ACK packet. The scanner host responds with an RST packet, closing the connection before the handshake is completed. If the port is closed but unfiltered, the target will instantly respond with a RST packet.
+      -UDP Scanning: Packet is sent to a port that is not open, the system will respond with an ICMP port unreachable message. Most UDP port scanners use this scanning method, and use the absence of a response to infer that a port is open. However, if a port is blocked by a firewall, this method will falsely report that the port is open.
+      -ACK Scanning: Used to determine if a port is filtered or not.
+      -Window Scanning: 
+      -FIN Scanning:  FIN packets can bypass firewalls without modification. Closed ports reply to a FIN packet with the appropriate RST packet, whereas open ports ignore the packet on hand. This is typical behavior due to the nature of TCP, and is in some ways an inescapable downfall.
+
+http://www.giac.org/paper/gsec/312/firewalk-attackers-firewall/100588
+   -TraceRoute utilized the TTL (Time To Live) of an IP packet to trace its progression through routers to a destination.
+   -Firewalk - a tool which steps through routers on destination path and gathers information from each about which ports are open, closed, etc. This should be done once for each step of the way.
+
+
+https://danielmiessler.com/study/tcpdump/
+   -X : Displays both hex and ASCII content within the packet
+   -S : Changes the display of a sequence of numbers to absolute rather than relative.
+   -n : Requests that names are not resolved, resulting in the IPs themselves being displayed.
+   -nm : Don't resolve hostnames or port names.
+   -c : Only get x number of packets and then stop.
+   
+   Examples:
+      #tcpdump host 1.2.3.4  -->  look for traffic basedo n IP address
+      #tcpdump src 2.3.4.5   &
+      #tcpdump dst 3.4.5.6   -->  find traffic from only a source or destination
+      #tcpdump port 3389     -->  see only traffic to or from a specific port
+      #tcpdump src port 1025 #tcpdump dst port 389 --> filter based on the source and destination port
+      
+      Port Ranges:  tcpdump portrange 21-23
+      Packet Size:  tcpdump less 32 ... or ... tcpdump greater 128
+      or...      :  tcpdump > 32 ... or ... tcpdump <= 128
+
+      Using AND, OR, EXCEPT
+      
+      tcpdump -nnvvS src 10.5.2.3 and dst port 3389  -->  Traffic from 10.5.2.3 destined for port 3389
+
+
+http://www.perlfect.com/articles/chmod.shtml
+   -UNIX identifies each user by a User ID (UID) and the username.
+   -Groups: Users can be organized into groups, and a single user may belong to more than one group. The purpose is so that an entire group can be granted privileges to share specific files.
+   -Every file in unix has an owner user and an owner group.
+   -Every file is associated with a set of permissions. (who can read, write, execute)
+      -What can the owner do, what can the owner group do, what can the world do.
+         -This is indicated by 9 bits, rwxrwxrwx. If a bit is 0, we put a dash.
+         -Example rwxrw---x  -->  Owner can read/write/execute, owner group can read/write, world can execute.
+         -There is also another bit that preceedes the 9 bits.
+            -either a 'd' for directory, or '-' for a file
+         -This information can be displayed by typing $ ls -l
+   -Directory permissions are a bit different
+      -Read: User can view the contents
+      -Write: User can create new files or delete files in directory
+      -Execute: User can cd into the directory
+   -chmod: Only the owner of a file may use this to alter that file's permissions
+      -$ chmod [options] mode <files>
+      -mode
+         -u (user) g (group) o (others) a (all)
+         -permissions are started with user type, followed by a +/- to indicate adding or subtracting permissions.
+            -Permissions are then just rwx
+            -Example: chmod go-rxw jared.txt  --> Remove all permissions from group and other for file jared.txt
+            -We can also do something like this in linux: cdmod 751 <filename> -rwxr-x--x
+   
+   
+https://www.owasp.org/images/0/08/OWASP_SCP_Quick_Reference_Guide_v2.pdf
+     -We want to maintain confidentiality, integrity, and availability.
+
+
+https://www.securecoding.cert.org/confluence/display/seccode/Top+10+Secure+Coding+Practices
+   -Top 10 coding practices:
+      -Validate input
+      -Heed compiler warnings
+      -Architect for security policies
+      -Keep it simple
+      -Default Deny - Base access decisions on permission, rather than exclusion.
+      -Sanitize data sent to other systems
+      -Practice defense in depth
+      -Effective quality assurance techniques - Fuzz testing, penetration testin, and source code audits
+      -Adopt a secure coding standard
+   
+    -Bonus
+      -Define Security Requirements : early on, define requirements and build accordingly
+      -Model threats
+      
